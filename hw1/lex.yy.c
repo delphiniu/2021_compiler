@@ -360,43 +360,22 @@ struct yy_trans_info
 	flex_int32_t yy_verify;
 	flex_int32_t yy_nxt;
 	};
-static const flex_int16_t yy_acclist[159] =
+static const flex_int16_t yy_accept[124] =
     {   0,
-       53,   52,   51,   52,   50,   52,   33,   52,   51,   52,
-       28,   52,   52,   34,   52,   35,   52,    6,   52,    3,
-       52,   27,   52,    4,   52,   52,    5,   52,   24,   52,
-       26,   52,   45,   52,   38,   52,   44,   52,   22,   52,
-       22,   52,   22,   52,   22,   52,   22,   52,   22,   52,
-       22,   52,   22,   52,   22,   52,   22,   52,   22,   52,
-       22,   52,   36,   52,   52,   37,   52,   49,   23,   43,
-       29,   41,   31,   39,   32,   40,   25,    1,   42,   24,
-       47,   48,   46,   22,   22,   22,   22,   22,   22,   22,
-       22,   22,   13,   22,   22,   22,   22,   22,   22,   22,
+        0,    0,    0,    0,   53,   52,   51,   50,   33,   51,
+       28,   52,   34,   35,    6,    3,   27,    4,   52,    5,
+       24,   26,   45,   38,   44,   22,   22,   22,   22,   22,
+       22,   22,   22,   22,   22,   22,   22,   36,   52,   37,
+       49,    0,   23,    0,   43,   29,   41,   31,   39,   32,
+       40,   25,    0,    1,   42,    0,   24,   47,   48,   46,
+       22,   22,   22,   22,   22,   22,   22,   22,   22,   13,
+       22,   22,   22,   22,   22,   22,   22,   30,   23,    0,
+        0,    1,   22,   22,   22,   22,   22,   22,   16,    7,
+       22,   22,   22,   22,   22,   22,    2,    9,   22,   22,
 
-       22,   30,   23,    1,   22,   22,   22,   22,   22,   22,
-       16,   22,    7,   22,   22,   22,   22,   22,   22,   22,
-        2,    9,   22,   22,   22,   14,   22,   22,   22,   22,
-       22,   22,   11,   22,   20,   22,   22,   18,   22,   22,
-       12,   22,    8,   22,   15,   22,   22,   22,   17,   22,
-       22,   19,   22,   10,   22,   22,   21,   22
-    } ;
-
-static const flex_int16_t yy_accept[125] =
-    {   0,
-        1,    1,    1,    1,    1,    2,    3,    5,    7,    9,
-       11,   13,   14,   16,   18,   20,   22,   24,   26,   27,
-       29,   31,   33,   35,   37,   39,   41,   43,   45,   47,
-       49,   51,   53,   55,   57,   59,   61,   63,   65,   66,
-       68,   69,   69,   70,   70,   71,   72,   73,   74,   75,
-       76,   77,   78,   78,   79,   80,   80,   81,   82,   83,
-       84,   85,   86,   87,   88,   89,   90,   91,   92,   93,
-       95,   96,   97,   98,   99,  100,  101,  102,  103,  104,
-      104,  104,  105,  106,  107,  108,  109,  110,  111,  113,
-      115,  116,  117,  118,  119,  120,  121,  122,  124,  125,
-
-      126,  128,  129,  130,  131,  132,  133,  135,  137,  138,
-      140,  141,  143,  145,  147,  148,  149,  151,  152,  154,
-      156,  157,  159,  159
+       14,   22,   22,   22,   22,   22,   11,   20,   22,   18,
+       22,   12,    8,   15,   22,   22,   17,   22,   19,   10,
+       22,   21,    0
     } ;
 
 static const YY_CHAR yy_ec[256] =
@@ -540,20 +519,16 @@ static const flex_int16_t yy_chk[258] =
       123,  123,  123,  123,  123,  123,  123
     } ;
 
+static yy_state_type yy_last_accepting_state;
+static char *yy_last_accepting_cpos;
+
 extern int yy_flex_debug;
 int yy_flex_debug = 0;
 
-static yy_state_type *yy_state_buf=0, *yy_state_ptr=0;
-static char *yy_full_match;
-static int yy_lp;
-#define REJECT \
-{ \
-*yy_cp = (yy_hold_char); /* undo effects of setting up yytext */ \
-yy_cp = (yy_full_match); /* restore poss. backed-over text */ \
-++(yy_lp); \
-goto find_rule; \
-}
-
+/* The intent behind this definition is that it'll catch
+ * any uses of REJECT which flex missed.
+ */
+#define REJECT reject_used_but_not_detected
 #define yymore() yymore_used_but_not_detected
 #define YY_MORE_ADJ 0
 #define YY_RESTORE_YY_MORE_OFFSET
@@ -570,15 +545,11 @@ char *yytext;
 
     int line_num = 1;
     int comment_num = 0;
-    char is_str = '\0';
-    char is_cmt = '\0';
-    char is_pcmt = '\0';
-    int cmt_newline = 0;
-#line 578 "lex.yy.c"
+#line 549 "lex.yy.c"
 
 /* Define regular expression label */
 /* Rules section */
-#line 582 "lex.yy.c"
+#line 553 "lex.yy.c"
 
 #define INITIAL 0
 #define CMT 1
@@ -777,12 +748,6 @@ YY_DECL
 		YY_USER_INIT;
 #endif
 
-        /* Create the reject buffer large enough to save one state per allowed character. */
-        if ( ! (yy_state_buf) )
-            (yy_state_buf) = (yy_state_type *)yyalloc(YY_STATE_BUF_SIZE  );
-            if ( ! (yy_state_buf) )
-                YY_FATAL_ERROR( "out of dynamic memory in yylex()" );
-
 		if ( ! (yy_start) )
 			(yy_start) = 1;	/* first start state */
 
@@ -802,10 +767,10 @@ YY_DECL
 		}
 
 	{
-#line 63 "compiler_hw1.l"
+#line 59 "compiler_hw1.l"
 
 
-#line 809 "lex.yy.c"
+#line 774 "lex.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -820,14 +785,15 @@ YY_DECL
 		yy_bp = yy_cp;
 
 		yy_current_state = (yy_start);
-
-		(yy_state_ptr) = (yy_state_buf);
-		*(yy_state_ptr)++ = yy_current_state;
-
 yy_match:
 		do
 			{
 			YY_CHAR yy_c = yy_ec[YY_SC_TO_UI(*yy_cp)] ;
+			if ( yy_accept[yy_current_state] )
+				{
+				(yy_last_accepting_state) = yy_current_state;
+				(yy_last_accepting_cpos) = yy_cp;
+				}
 			while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 				{
 				yy_current_state = (int) yy_def[yy_current_state];
@@ -835,30 +801,17 @@ yy_match:
 					yy_c = yy_meta[yy_c];
 				}
 			yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
-			*(yy_state_ptr)++ = yy_current_state;
 			++yy_cp;
 			}
 		while ( yy_base[yy_current_state] != 212 );
 
 yy_find_action:
-		yy_current_state = *--(yy_state_ptr);
-		(yy_lp) = yy_accept[yy_current_state];
-
-find_rule: /* we branch to this label when backing up */
-
-		for ( ; ; ) /* until we find what rule we matched */
-			{
-			if ( (yy_lp) && (yy_lp) < yy_accept[yy_current_state + 1] )
-				{
-				yy_act = yy_acclist[(yy_lp)];
-					{
-					(yy_full_match) = yy_cp;
-					break;
-					}
-				}
-			--yy_cp;
-			yy_current_state = *--(yy_state_ptr);
-			(yy_lp) = yy_accept[yy_current_state];
+		yy_act = yy_accept[yy_current_state];
+		if ( yy_act == 0 )
+			{ /* have to back up */
+			yy_cp = (yy_last_accepting_cpos);
+			yy_current_state = (yy_last_accepting_state);
+			yy_act = yy_accept[yy_current_state];
 			}
 
 		YY_DO_BEFORE_ACTION;
@@ -867,15 +820,22 @@ do_action:	/* This label is used only to access EOF actions. */
 
 		switch ( yy_act )
 	{ /* beginning of action switch */
+			case 0: /* must back up */
+			/* undo the effects of YY_DO_BEFORE_ACTION */
+			*yy_cp = (yy_hold_char);
+			yy_cp = (yy_last_accepting_cpos);
+			yy_current_state = (yy_last_accepting_state);
+			goto yy_find_action;
+
 case 1:
 YY_RULE_SETUP
-#line 65 "compiler_hw1.l"
+#line 61 "compiler_hw1.l"
 { printf("%-8s \t %s\n", yytext, "C++ Comment"); comment_num++; }
 	YY_BREAK
 case 2:
 /* rule 2 can match eol */
 YY_RULE_SETUP
-#line 66 "compiler_hw1.l"
+#line 62 "compiler_hw1.l"
 { int cur = 0, pre = 0;
               while(1)
               {
@@ -901,111 +861,108 @@ YY_RULE_SETUP
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 88 "compiler_hw1.l"
+#line 84 "compiler_hw1.l"
 { printf("%-8s \t %s\n", yytext, "ADD"); }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 89 "compiler_hw1.l"
+#line 85 "compiler_hw1.l"
 { printf("%-8s \t %s\n", yytext, "SUB"); }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 90 "compiler_hw1.l"
+#line 86 "compiler_hw1.l"
 { printf("%-8s \t %s\n", yytext, "QUO"); }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 91 "compiler_hw1.l"
+#line 87 "compiler_hw1.l"
 { printf("%-8s \t %s\n", yytext, "MUL"); }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 92 "compiler_hw1.l"
+#line 88 "compiler_hw1.l"
 { printf("%-8s \t %s\n", yytext, "INT"); }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 93 "compiler_hw1.l"
+#line 89 "compiler_hw1.l"
 { printf("%-8s \t %s\n", yytext, "FLOAT"); }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 94 "compiler_hw1.l"
+#line 90 "compiler_hw1.l"
 { printf("%-8s \t %s\n", yytext, "BOOL"); }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 95 "compiler_hw1.l"
+#line 91 "compiler_hw1.l"
 { printf("%-8s \t %s\n", yytext, "STRING"); }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 96 "compiler_hw1.l"
+#line 92 "compiler_hw1.l"
 { printf("%-8s \t %s\n", yytext, "TRUE"); }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 97 "compiler_hw1.l"
+#line 93 "compiler_hw1.l"
 { printf("%-8s \t %s\n", yytext, "FALSE"); }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 98 "compiler_hw1.l"
+#line 94 "compiler_hw1.l"
 { printf("%-8s \t %s\n", yytext, "IF"); }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 99 "compiler_hw1.l"
+#line 95 "compiler_hw1.l"
 { printf("%-8s \t %s\n", yytext, "ELSE"); }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 100 "compiler_hw1.l"
+#line 96 "compiler_hw1.l"
 { printf("%-8s \t %s\n", yytext, "PRINT"); }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 101 "compiler_hw1.l"
+#line 97 "compiler_hw1.l"
 { printf("%-8s \t %s\n", yytext, "FOR"); }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 102 "compiler_hw1.l"
+#line 98 "compiler_hw1.l"
 { printf("%-8s \t %s\n", yytext, "WHILE"); }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 103 "compiler_hw1.l"
+#line 99 "compiler_hw1.l"
 { printf("%-8s \t %s\n", yytext, "BREAK"); }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 104 "compiler_hw1.l"
+#line 100 "compiler_hw1.l"
 { printf("%-8s \t %s\n", yytext, "RETURN"); }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 105 "compiler_hw1.l"
+#line 101 "compiler_hw1.l"
 { printf("%-8s \t %s\n", yytext, "VOID"); }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 106 "compiler_hw1.l"
+#line 102 "compiler_hw1.l"
 { printf("%-8s \t %s\n", yytext, "CONTINUE"); }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 107 "compiler_hw1.l"
-{ if(is_str || is_cmt || is_pcmt)
-                  REJECT
-              else
-                  printf("%-8s \t %s\n", yytext, "IDENT"); }
+#line 103 "compiler_hw1.l"
+{ printf("%-8s \t %s\n", yytext, "IDENT"); }
 	YY_BREAK
 case 23:
 /* rule 23 can match eol */
 YY_RULE_SETUP
-#line 111 "compiler_hw1.l"
+#line 104 "compiler_hw1.l"
 { printf("%-8s \t %s\n", "\"", "QUOTA");
               char s[strlen(yytext)];
               for(int i = 1; i < strlen(yytext); i++)
@@ -1017,156 +974,156 @@ YY_RULE_SETUP
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 119 "compiler_hw1.l"
+#line 112 "compiler_hw1.l"
 { printf("%-8s \t %s\n", yytext, "INT_LIT"); }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 120 "compiler_hw1.l"
+#line 113 "compiler_hw1.l"
 { printf("%-8s \t %s\n", yytext, "FLOAT_LIT"); }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 121 "compiler_hw1.l"
+#line 114 "compiler_hw1.l"
 { printf("%-8s \t %s\n", yytext, "SEMICOLON"); }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 122 "compiler_hw1.l"
+#line 115 "compiler_hw1.l"
 { printf("%-8s \t %s\n", yytext, "COMMA"); }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 123 "compiler_hw1.l"
+#line 116 "compiler_hw1.l"
 { printf("%-8s \t %s\n", yytext, "REM"); }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 124 "compiler_hw1.l"
+#line 117 "compiler_hw1.l"
 { printf("%-8s \t %s\n", yytext, "AND"); }
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 125 "compiler_hw1.l"
+#line 118 "compiler_hw1.l"
 { printf("%-8s \t %s\n", yytext, "OR"); }
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 126 "compiler_hw1.l"
+#line 119 "compiler_hw1.l"
 { printf("%-8s \t %s\n", yytext, "INC"); }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 127 "compiler_hw1.l"
+#line 120 "compiler_hw1.l"
 { printf("%-8s \t %s\n", yytext, "DEC"); }
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 128 "compiler_hw1.l"
+#line 121 "compiler_hw1.l"
 { printf("%-8s \t %s\n", yytext, "NOT"); }
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 129 "compiler_hw1.l"
+#line 122 "compiler_hw1.l"
 { printf("%-8s \t %s\n", yytext, "LPAREN"); }
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 130 "compiler_hw1.l"
+#line 123 "compiler_hw1.l"
 { printf("%-8s \t %s\n", yytext, "RPAREN"); }
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 131 "compiler_hw1.l"
+#line 124 "compiler_hw1.l"
 { printf("%-8s \t %s\n", yytext, "LBRACE"); }
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 132 "compiler_hw1.l"
+#line 125 "compiler_hw1.l"
 { printf("%-8s \t %s\n", yytext, "RBRACE"); }
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 133 "compiler_hw1.l"
+#line 126 "compiler_hw1.l"
 { printf("%-8s \t %s\n", yytext, "ASSIGN"); }
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 134 "compiler_hw1.l"
+#line 127 "compiler_hw1.l"
 { printf("%-8s \t %s\n", yytext, "ADD_ASSIGN"); }
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 135 "compiler_hw1.l"
+#line 128 "compiler_hw1.l"
 { printf("%-8s \t %s\n", yytext, "SUB_ASSIGN"); }
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 136 "compiler_hw1.l"
+#line 129 "compiler_hw1.l"
 { printf("%-8s \t %s\n", yytext, "MUL_ASSIGN"); }
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 137 "compiler_hw1.l"
+#line 130 "compiler_hw1.l"
 { printf("%-8s \t %s\n", yytext, "QUO_ASSIGN"); }
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 138 "compiler_hw1.l"
+#line 131 "compiler_hw1.l"
 { printf("%-8s \t %s\n", yytext, "REM_ASSIGN"); }
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
-#line 139 "compiler_hw1.l"
+#line 132 "compiler_hw1.l"
 { printf("%-8s \t %s\n", yytext, "GTR"); }
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 140 "compiler_hw1.l"
+#line 133 "compiler_hw1.l"
 { printf("%-8s \t %s\n", yytext, "LSS"); }
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 141 "compiler_hw1.l"
+#line 134 "compiler_hw1.l"
 { printf("%-8s \t %s\n", yytext, "GEQ"); }
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 142 "compiler_hw1.l"
+#line 135 "compiler_hw1.l"
 { printf("%-8s \t %s\n", yytext, "LEQ"); }
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 143 "compiler_hw1.l"
+#line 136 "compiler_hw1.l"
 { printf("%-8s \t %s\n", yytext, "EQL"); }
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
-#line 144 "compiler_hw1.l"
+#line 137 "compiler_hw1.l"
 { printf("%-8s \t %s\n", yytext, "NEQ"); }
 	YY_BREAK
 case 50:
 /* rule 50 can match eol */
 YY_RULE_SETUP
-#line 145 "compiler_hw1.l"
+#line 138 "compiler_hw1.l"
 { line_num++; }
 	YY_BREAK
 case 51:
 YY_RULE_SETUP
-#line 146 "compiler_hw1.l"
+#line 139 "compiler_hw1.l"
 { ;}
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(CMT):
-#line 148 "compiler_hw1.l"
+#line 141 "compiler_hw1.l"
 { yyterminate(); }
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 151 "compiler_hw1.l"
+#line 144 "compiler_hw1.l"
 ECHO;
 	YY_BREAK
-#line 1170 "lex.yy.c"
+#line 1127 "lex.yy.c"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -1357,8 +1314,38 @@ static int yy_get_next_buffer (void)
 		while ( num_to_read <= 0 )
 			{ /* Not enough room in the buffer - grow it. */
 
-			YY_FATAL_ERROR(
-"input buffer overflow, can't enlarge buffer because scanner uses REJECT" );
+			/* just a shorter name for the current buffer */
+			YY_BUFFER_STATE b = YY_CURRENT_BUFFER_LVALUE;
+
+			int yy_c_buf_p_offset =
+				(int) ((yy_c_buf_p) - b->yy_ch_buf);
+
+			if ( b->yy_is_our_buffer )
+				{
+				int new_size = b->yy_buf_size * 2;
+
+				if ( new_size <= 0 )
+					b->yy_buf_size += b->yy_buf_size / 8;
+				else
+					b->yy_buf_size *= 2;
+
+				b->yy_ch_buf = (char *)
+					/* Include room in for 2 EOB chars. */
+					yyrealloc( (void *) b->yy_ch_buf,
+							 (yy_size_t) (b->yy_buf_size + 2)  );
+				}
+			else
+				/* Can't grow it, we don't own it. */
+				b->yy_ch_buf = NULL;
+
+			if ( ! b->yy_ch_buf )
+				YY_FATAL_ERROR(
+				"fatal error - scanner input buffer overflow" );
+
+			(yy_c_buf_p) = &b->yy_ch_buf[yy_c_buf_p_offset];
+
+			num_to_read = YY_CURRENT_BUFFER_LVALUE->yy_buf_size -
+						number_to_move - 1;
 
 			}
 
@@ -1420,12 +1407,14 @@ static int yy_get_next_buffer (void)
     
 	yy_current_state = (yy_start);
 
-	(yy_state_ptr) = (yy_state_buf);
-	*(yy_state_ptr)++ = yy_current_state;
-
 	for ( yy_cp = (yytext_ptr) + YY_MORE_ADJ; yy_cp < (yy_c_buf_p); ++yy_cp )
 		{
 		YY_CHAR yy_c = (*yy_cp ? yy_ec[YY_SC_TO_UI(*yy_cp)] : 1);
+		if ( yy_accept[yy_current_state] )
+			{
+			(yy_last_accepting_state) = yy_current_state;
+			(yy_last_accepting_cpos) = yy_cp;
+			}
 		while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 			{
 			yy_current_state = (int) yy_def[yy_current_state];
@@ -1433,7 +1422,6 @@ static int yy_get_next_buffer (void)
 				yy_c = yy_meta[yy_c];
 			}
 		yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
-		*(yy_state_ptr)++ = yy_current_state;
 		}
 
 	return yy_current_state;
@@ -1447,8 +1435,14 @@ static int yy_get_next_buffer (void)
     static yy_state_type yy_try_NUL_trans  (yy_state_type yy_current_state )
 {
 	int yy_is_jam;
-    
+    	char *yy_cp = (yy_c_buf_p);
+
 	YY_CHAR yy_c = 1;
+	if ( yy_accept[yy_current_state] )
+		{
+		(yy_last_accepting_state) = yy_current_state;
+		(yy_last_accepting_cpos) = yy_cp;
+		}
 	while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 		{
 		yy_current_state = (int) yy_def[yy_current_state];
@@ -1457,8 +1451,6 @@ static int yy_get_next_buffer (void)
 		}
 	yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
 	yy_is_jam = (yy_current_state == 123);
-	if ( ! yy_is_jam )
-		*(yy_state_ptr)++ = yy_current_state;
 
 		return yy_is_jam ? 0 : yy_current_state;
 }
@@ -2047,11 +2039,6 @@ static int yy_init_globals (void)
     (yy_init) = 0;
     (yy_start) = 0;
 
-    (yy_state_buf) = 0;
-    (yy_state_ptr) = 0;
-    (yy_full_match) = 0;
-    (yy_lp) = 0;
-
 /* Defined in main.c */
 #ifdef YY_STDINIT
     yyin = stdin;
@@ -2081,9 +2068,6 @@ int yylex_destroy  (void)
 	/* Destroy the stack itself. */
 	yyfree((yy_buffer_stack) );
 	(yy_buffer_stack) = NULL;
-
-    yyfree ( (yy_state_buf) );
-    (yy_state_buf)  = NULL;
 
     /* Reset the globals. This is important in a non-reentrant scanner so the next time
      * yylex() is called, initialization will occur. */
@@ -2142,7 +2126,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 151 "compiler_hw1.l"
+#line 144 "compiler_hw1.l"
 
 /*  C Code section */
 /*

@@ -9,10 +9,6 @@
 
     int line_num = 1;
     int comment_num = 0;
-    char is_str = '\0';
-    char is_cmt = '\0';
-    char is_pcmt = '\0';
-    int cmt_newline = 0;
 %}
 
 %START CMT
@@ -104,10 +100,7 @@ continue "continue"
 {return}    { printf("%-8s \t %s\n", yytext, "RETURN"); }
 {void}      { printf("%-8s \t %s\n", yytext, "VOID"); }
 {continue}  { printf("%-8s \t %s\n", yytext, "CONTINUE"); }
-{id}        { if(is_str || is_cmt || is_pcmt)
-                  REJECT
-              else
-                  printf("%-8s \t %s\n", yytext, "IDENT"); }
+{id}        { printf("%-8s \t %s\n", yytext, "IDENT"); }
 {strlit}    { printf("%-8s \t %s\n", "\"", "QUOTA");
               char s[strlen(yytext)];
               for(int i = 1; i < strlen(yytext); i++)
