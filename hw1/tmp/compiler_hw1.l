@@ -11,18 +11,20 @@
     int comment_num = 0;
 %}
 
+%START CMT
 /* Define regular expression label */
 letter [a-zA-Z_]
 digit [0-9]
+cmt "/*"|"*/"
 float "float"
 bool "bool"
 string "string"
 true "true"
 false "false"
 cpp_cmt "//"[^\n]*
-c_cmt "/*"([^*]|\*[^*/])*\*+"/"
-id {letter}({letter}|{digit})*
-strlit "\""(("\\""\"")|[^"])*"\""
+c_cmt "/*"([^*]|\*+[^*/])*\*+"/"
+id {letter}+({letter}|{digit})*
+strlit "\""(("\\"+"\"")|[^"])*"\""
 inumber {digit}+
 fnumber ({digit}*\.{digit}+)
 and "&&"
