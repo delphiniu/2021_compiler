@@ -19,4 +19,10 @@ typedef struct table{
     int top;
 }table;
 
+typedef struct estack{
+    int top;
+    char stk[100];
+    struct estack *next;
+}estack;
+
 #endif /* COMMON_H */

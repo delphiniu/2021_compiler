@@ -1,8 +1,6 @@
 Terminals unused in grammar
 
     SEMICOLON
-    INC
-    DEC
     STRING_LIT
 
 
@@ -43,67 +41,87 @@ Grammar
    21 Literal: INT_LIT
    22        | FLOAT_LIT
 
-   23 Expr: AndExpr OR Expr
+   23 Expr: AndExpr or Expr
    24     | AndExpr
 
-   25 AndExpr: CmprExpr AND AndExpr
-   26        | CmprExpr
+   25 or: OR
 
-   27 CmprExpr: CmprExpr '<' AddExpr
-   28         | CmprExpr '>' AddExpr
-   29         | CmprExpr SMALL_EQU AddExpr
-   30         | CmprExpr BIG_EQU AddExpr
-   31         | CmprExpr EQUAL AddExpr
-   32         | CmprExpr NOT_EQUAL AddExpr
-   33         | AddExpr
+   26 AndExpr: CmprExpr and AndExpr
+   27        | CmprExpr
 
-   34 AddExpr: MulExpr '+' AddExpr
-   35        | MulExpr '-' AddExpr
-   36        | MulExpr
+   28 and: AND
 
-   37 MulExpr: UnaExpr '*' MulExpr
-   38        | UnaExpr '/' MulExpr
-   39        | UnaExpr '%' MulExpr
-   40        | UnaExpr
+   29 CmprExpr: CmprExpr Cmpr AddExpr
+   30         | AddExpr
 
-   41 UnaExpr: SignOpt Atom
-   42        | Reverse Boolean
+   31 Cmpr: '<'
+   32     | '>'
+   33     | SMALL_EQU
+   34     | BIG_EQU
+   35     | EQUAL
+   36     | NOT_EQUAL
 
-   43 SignOpt: '+' SignOpt
-   44        | '-' SignOpt
-   45        | %empty
+   37 AddExpr: MulExpr Add AddExpr
+   38        | MulExpr
 
-   46 Reverse: '!' Reverse
-   47        | %empty
+   39 Add: '+'
+   40    | '-'
 
-   48 Atom: Ident
-   49     | Literal
-   50     | '(' Expr ')'
-   51     | '[' Expr ']'
+   41 MulExpr: UnaExpr Mul MulExpr
+   42        | UnaExpr
 
-   52 Boolean: TRUE
-   53        | FALSE
+   43 Mul: '*'
+   44    | '/'
+   45    | '%'
 
-   54 PrintStmt: PRINT '(' Expr ')'
+   46 UnaExpr: SignOpt Atom
+   47        | Reverse Boolean
+
+   48 SignOpt: '+' SignOpt
+   49        | '-' SignOpt
+   50        | %empty
+
+   51 Reverse: '!' Reverse
+   52        | %empty
+
+   53 Atom: Ident
+   54     | Ident OneArith
+   55     | OneArith Ident
+   56     | Literal
+   57     | BracExpr Expr BracExpr
+   58     | '[' Expr ']'
+
+   59 OneArith: INC
+   60         | DEC
+
+   61 Boolean: TRUE
+   62        | FALSE
+
+   63 PrintStmt: PRINT '(' Expr LeavePrint
+
+   64 LeavePrint: ')'
+
+   65 BracExpr: '('
+   66         | ')'
 
 
 Terminals, with rules where they appear
 
     $end (0) 0
-    '!' (33) 46
-    '%' (37) 39
-    '(' (40) 50 54
-    ')' (41) 50 54
-    '*' (42) 37
-    '+' (43) 34 43
-    '-' (45) 35 44
-    '/' (47) 38
+    '!' (33) 51
+    '%' (37) 45
+    '(' (40) 63 65
+    ')' (41) 64 66
+    '*' (42) 43
+    '+' (43) 39 48
+    '-' (45) 40 49
+    '/' (47) 44
     ';' (59) 2 3
-    '<' (60) 27
+    '<' (60) 31
     '=' (61) 19
-    '>' (62) 28
-    '[' (91) 51
-    ']' (93) 51
+    '>' (62) 32
+    '[' (91) 58
+    ']' (93) 58
     error (256)
     INT (258) 14
     FLOAT (259) 15
@@ -113,17 +131,17 @@ Terminals, with rules where they appear
     Block (263) 6
     IfStmt (264) 7
     LoopStmt (265) 8
-    PRINT (266) 54
-    INC (267)
-    DEC (268)
-    BIG_EQU (269) 30
-    SMALL_EQU (270) 29
-    EQUAL (271) 31
-    NOT_EQUAL (272) 32
-    AND (273) 25
-    OR (274) 23
-    TRUE (275) 52
-    FALSE (276) 53
+    PRINT (266) 63
+    INC (267) 59
+    DEC (268) 60
+    BIG_EQU (269) 34
+    SMALL_EQU (270) 33
+    EQUAL (271) 35
+    NOT_EQUAL (272) 36
+    AND (273) 28
+    OR (274) 25
+    TRUE (275) 61
+    FALSE (276) 62
     INT_LIT <i_val> (277) 21
     FLOAT_LIT <f_val> (278) 22
     STRING_LIT <s_val> (279)
@@ -160,46 +178,70 @@ Nonterminals, with rules where they appear
         on right: 13
     Ident (49)
         on left: 18
-        on right: 12 48
+        on right: 12 53 54 55
     LitInit (50)
         on left: 19 20
         on right: 12
     Literal (51)
         on left: 21 22
-        on right: 19 49
+        on right: 19 56
     Expr (52)
         on left: 23 24
-        on right: 5 23 50 51 54
-    AndExpr (53)
-        on left: 25 26
-        on right: 23 24 25
-    CmprExpr (54)
-        on left: 27 28 29 30 31 32 33
-        on right: 25 26 27 28 29 30 31 32
-    AddExpr (55)
-        on left: 34 35 36
-        on right: 27 28 29 30 31 32 33 34 35
-    MulExpr (56)
-        on left: 37 38 39 40
-        on right: 34 35 36 37 38 39
-    UnaExpr (57)
+        on right: 5 23 57 58 63
+    or (53)
+        on left: 25
+        on right: 23
+    AndExpr (54)
+        on left: 26 27
+        on right: 23 24 26
+    and (55)
+        on left: 28
+        on right: 26
+    CmprExpr (56)
+        on left: 29 30
+        on right: 26 27 29
+    Cmpr (57)
+        on left: 31 32 33 34 35 36
+        on right: 29
+    AddExpr (58)
+        on left: 37 38
+        on right: 29 30 37
+    Add (59)
+        on left: 39 40
+        on right: 37
+    MulExpr (60)
         on left: 41 42
-        on right: 37 38 39 40
-    SignOpt (58)
+        on right: 37 38 41
+    Mul (61)
         on left: 43 44 45
-        on right: 41 43 44
-    Reverse (59)
-        on left: 46 47
-        on right: 42 46
-    Atom (60)
-        on left: 48 49 50 51
         on right: 41
-    Boolean (61)
-        on left: 52 53
-        on right: 42
-    PrintStmt (62)
-        on left: 54
+    UnaExpr (62)
+        on left: 46 47
+        on right: 41 42
+    SignOpt (63)
+        on left: 48 49 50
+        on right: 46 48 49
+    Reverse (64)
+        on left: 51 52
+        on right: 47 51
+    Atom (65)
+        on left: 53 54 55 56 57 58
+        on right: 46
+    OneArith (66)
+        on left: 59 60
+        on right: 54 55
+    Boolean (67)
+        on left: 61 62
+        on right: 47
+    PrintStmt (68)
+        on left: 63
         on right: 9
+    LeavePrint (69)
+        on left: 64
+        on right: 63
+    BracExpr (70)
+        on left: 65 66
+        on right: 57
 
 
 State 0
@@ -235,9 +277,9 @@ State 2
     '-'       shift, and go to state 13
     '!'       shift, and go to state 14
 
-    TRUE      reduce using rule 47 (Reverse)
-    FALSE     reduce using rule 47 (Reverse)
-    $default  reduce using rule 45 (SignOpt)
+    TRUE      reduce using rule 52 (Reverse)
+    FALSE     reduce using rule 52 (Reverse)
+    $default  reduce using rule 50 (SignOpt)
 
     StatementList    go to state 15
     Statement        go to state 16
@@ -313,42 +355,42 @@ State 10
 
 State 11
 
-   54 PrintStmt: PRINT . '(' Expr ')'
+   63 PrintStmt: PRINT . '(' Expr LeavePrint
 
     '('  shift, and go to state 29
 
 
 State 12
 
-   43 SignOpt: '+' . SignOpt
+   48 SignOpt: '+' . SignOpt
 
     '+'  shift, and go to state 12
     '-'  shift, and go to state 13
 
-    $default  reduce using rule 45 (SignOpt)
+    $default  reduce using rule 50 (SignOpt)
 
     SignOpt  go to state 30
 
 
 State 13
 
-   44 SignOpt: '-' . SignOpt
+   49 SignOpt: '-' . SignOpt
 
     '+'  shift, and go to state 12
     '-'  shift, and go to state 13
 
-    $default  reduce using rule 45 (SignOpt)
+    $default  reduce using rule 50 (SignOpt)
 
     SignOpt  go to state 31
 
 
 State 14
 
-   46 Reverse: '!' . Reverse
+   51 Reverse: '!' . Reverse
 
     '!'  shift, and go to state 14
 
-    $default  reduce using rule 47 (Reverse)
+    $default  reduce using rule 52 (Reverse)
 
     Reverse  go to state 32
 
@@ -402,92 +444,98 @@ State 20
 
 State 21
 
-   23 Expr: AndExpr . OR Expr
+   23 Expr: AndExpr . or Expr
    24     | AndExpr .
 
     OR  shift, and go to state 37
 
     $default  reduce using rule 24 (Expr)
 
+    or  go to state 38
+
 
 State 22
 
-   25 AndExpr: CmprExpr . AND AndExpr
-   26        | CmprExpr .
-   27 CmprExpr: CmprExpr . '<' AddExpr
-   28         | CmprExpr . '>' AddExpr
-   29         | CmprExpr . SMALL_EQU AddExpr
-   30         | CmprExpr . BIG_EQU AddExpr
-   31         | CmprExpr . EQUAL AddExpr
-   32         | CmprExpr . NOT_EQUAL AddExpr
+   26 AndExpr: CmprExpr . and AndExpr
+   27        | CmprExpr .
+   29 CmprExpr: CmprExpr . Cmpr AddExpr
 
-    BIG_EQU    shift, and go to state 38
-    SMALL_EQU  shift, and go to state 39
-    EQUAL      shift, and go to state 40
-    NOT_EQUAL  shift, and go to state 41
-    AND        shift, and go to state 42
-    '<'        shift, and go to state 43
-    '>'        shift, and go to state 44
+    BIG_EQU    shift, and go to state 39
+    SMALL_EQU  shift, and go to state 40
+    EQUAL      shift, and go to state 41
+    NOT_EQUAL  shift, and go to state 42
+    AND        shift, and go to state 43
+    '<'        shift, and go to state 44
+    '>'        shift, and go to state 45
 
-    $default  reduce using rule 26 (AndExpr)
+    $default  reduce using rule 27 (AndExpr)
+
+    and   go to state 46
+    Cmpr  go to state 47
 
 
 State 23
 
-   33 CmprExpr: AddExpr .
+   30 CmprExpr: AddExpr .
 
-    $default  reduce using rule 33 (CmprExpr)
+    $default  reduce using rule 30 (CmprExpr)
 
 
 State 24
 
-   34 AddExpr: MulExpr . '+' AddExpr
-   35        | MulExpr . '-' AddExpr
-   36        | MulExpr .
+   37 AddExpr: MulExpr . Add AddExpr
+   38        | MulExpr .
 
-    '+'  shift, and go to state 45
-    '-'  shift, and go to state 46
+    '+'  shift, and go to state 48
+    '-'  shift, and go to state 49
 
-    $default  reduce using rule 36 (AddExpr)
+    $default  reduce using rule 38 (AddExpr)
+
+    Add  go to state 50
 
 
 State 25
 
-   37 MulExpr: UnaExpr . '*' MulExpr
-   38        | UnaExpr . '/' MulExpr
-   39        | UnaExpr . '%' MulExpr
-   40        | UnaExpr .
+   41 MulExpr: UnaExpr . Mul MulExpr
+   42        | UnaExpr .
 
-    '*'  shift, and go to state 47
-    '/'  shift, and go to state 48
-    '%'  shift, and go to state 49
+    '*'  shift, and go to state 51
+    '/'  shift, and go to state 52
+    '%'  shift, and go to state 53
 
-    $default  reduce using rule 40 (MulExpr)
+    $default  reduce using rule 42 (MulExpr)
+
+    Mul  go to state 54
 
 
 State 26
 
-   41 UnaExpr: SignOpt . Atom
+   46 UnaExpr: SignOpt . Atom
 
-    INT_LIT    shift, and go to state 50
-    FLOAT_LIT  shift, and go to state 51
+    INC        shift, and go to state 55
+    DEC        shift, and go to state 56
+    INT_LIT    shift, and go to state 57
+    FLOAT_LIT  shift, and go to state 58
     IDENT      shift, and go to state 35
-    '('        shift, and go to state 52
-    '['        shift, and go to state 53
+    '['        shift, and go to state 59
+    '('        shift, and go to state 60
+    ')'        shift, and go to state 61
 
-    Ident    go to state 54
-    Literal  go to state 55
-    Atom     go to state 56
+    Ident     go to state 62
+    Literal   go to state 63
+    Atom      go to state 64
+    OneArith  go to state 65
+    BracExpr  go to state 66
 
 
 State 27
 
-   42 UnaExpr: Reverse . Boolean
+   47 UnaExpr: Reverse . Boolean
 
-    TRUE   shift, and go to state 57
-    FALSE  shift, and go to state 58
+    TRUE   shift, and go to state 67
+    FALSE  shift, and go to state 68
 
-    Boolean  go to state 59
+    Boolean  go to state 69
 
 
 State 28
@@ -499,17 +547,17 @@ State 28
 
 State 29
 
-   54 PrintStmt: PRINT '(' . Expr ')'
+   63 PrintStmt: PRINT '(' . Expr LeavePrint
 
     '+'  shift, and go to state 12
     '-'  shift, and go to state 13
     '!'  shift, and go to state 14
 
-    TRUE      reduce using rule 47 (Reverse)
-    FALSE     reduce using rule 47 (Reverse)
-    $default  reduce using rule 45 (SignOpt)
+    TRUE      reduce using rule 52 (Reverse)
+    FALSE     reduce using rule 52 (Reverse)
+    $default  reduce using rule 50 (SignOpt)
 
-    Expr      go to state 60
+    Expr      go to state 70
     AndExpr   go to state 21
     CmprExpr  go to state 22
     AddExpr   go to state 23
@@ -521,23 +569,23 @@ State 29
 
 State 30
 
-   43 SignOpt: '+' SignOpt .
+   48 SignOpt: '+' SignOpt .
 
-    $default  reduce using rule 43 (SignOpt)
+    $default  reduce using rule 48 (SignOpt)
 
 
 State 31
 
-   44 SignOpt: '-' SignOpt .
+   49 SignOpt: '-' SignOpt .
 
-    $default  reduce using rule 44 (SignOpt)
+    $default  reduce using rule 49 (SignOpt)
 
 
 State 32
 
-   46 Reverse: '!' Reverse .
+   51 Reverse: '!' Reverse .
 
-    $default  reduce using rule 46 (Reverse)
+    $default  reduce using rule 51 (Reverse)
 
 
 State 33
@@ -565,11 +613,11 @@ State 34
     '!'       shift, and go to state 14
 
     $end      reduce using rule 3 (StatementList)
-    TRUE      reduce using rule 47 (Reverse)
-    FALSE     reduce using rule 47 (Reverse)
-    $default  reduce using rule 45 (SignOpt)
+    TRUE      reduce using rule 52 (Reverse)
+    FALSE     reduce using rule 52 (Reverse)
+    $default  reduce using rule 50 (SignOpt)
 
-    StatementList    go to state 61
+    StatementList    go to state 71
     Statement        go to state 16
     DeclarationStmt  go to state 17
     Type             go to state 18
@@ -596,26 +644,33 @@ State 36
 
    12 DeclarationStmt: Type Ident . LitInit
 
-    '='  shift, and go to state 62
+    '='  shift, and go to state 72
 
     $default  reduce using rule 20 (LitInit)
 
-    LitInit  go to state 63
+    LitInit  go to state 73
 
 
 State 37
 
-   23 Expr: AndExpr OR . Expr
+   25 or: OR .
+
+    $default  reduce using rule 25 (or)
+
+
+State 38
+
+   23 Expr: AndExpr or . Expr
 
     '+'  shift, and go to state 12
     '-'  shift, and go to state 13
     '!'  shift, and go to state 14
 
-    TRUE      reduce using rule 47 (Reverse)
-    FALSE     reduce using rule 47 (Reverse)
-    $default  reduce using rule 45 (SignOpt)
+    TRUE      reduce using rule 52 (Reverse)
+    FALSE     reduce using rule 52 (Reverse)
+    $default  reduce using rule 50 (SignOpt)
 
-    Expr      go to state 64
+    Expr      go to state 74
     AndExpr   go to state 21
     CmprExpr  go to state 22
     AddExpr   go to state 23
@@ -625,95 +680,68 @@ State 37
     Reverse   go to state 27
 
 
-State 38
-
-   30 CmprExpr: CmprExpr BIG_EQU . AddExpr
-
-    '+'  shift, and go to state 12
-    '-'  shift, and go to state 13
-    '!'  shift, and go to state 14
-
-    TRUE      reduce using rule 47 (Reverse)
-    FALSE     reduce using rule 47 (Reverse)
-    $default  reduce using rule 45 (SignOpt)
-
-    AddExpr  go to state 65
-    MulExpr  go to state 24
-    UnaExpr  go to state 25
-    SignOpt  go to state 26
-    Reverse  go to state 27
-
-
 State 39
 
-   29 CmprExpr: CmprExpr SMALL_EQU . AddExpr
+   34 Cmpr: BIG_EQU .
 
-    '+'  shift, and go to state 12
-    '-'  shift, and go to state 13
-    '!'  shift, and go to state 14
-
-    TRUE      reduce using rule 47 (Reverse)
-    FALSE     reduce using rule 47 (Reverse)
-    $default  reduce using rule 45 (SignOpt)
-
-    AddExpr  go to state 66
-    MulExpr  go to state 24
-    UnaExpr  go to state 25
-    SignOpt  go to state 26
-    Reverse  go to state 27
+    $default  reduce using rule 34 (Cmpr)
 
 
 State 40
 
-   31 CmprExpr: CmprExpr EQUAL . AddExpr
+   33 Cmpr: SMALL_EQU .
 
-    '+'  shift, and go to state 12
-    '-'  shift, and go to state 13
-    '!'  shift, and go to state 14
-
-    TRUE      reduce using rule 47 (Reverse)
-    FALSE     reduce using rule 47 (Reverse)
-    $default  reduce using rule 45 (SignOpt)
-
-    AddExpr  go to state 67
-    MulExpr  go to state 24
-    UnaExpr  go to state 25
-    SignOpt  go to state 26
-    Reverse  go to state 27
+    $default  reduce using rule 33 (Cmpr)
 
 
 State 41
 
-   32 CmprExpr: CmprExpr NOT_EQUAL . AddExpr
+   35 Cmpr: EQUAL .
 
-    '+'  shift, and go to state 12
-    '-'  shift, and go to state 13
-    '!'  shift, and go to state 14
-
-    TRUE      reduce using rule 47 (Reverse)
-    FALSE     reduce using rule 47 (Reverse)
-    $default  reduce using rule 45 (SignOpt)
-
-    AddExpr  go to state 68
-    MulExpr  go to state 24
-    UnaExpr  go to state 25
-    SignOpt  go to state 26
-    Reverse  go to state 27
+    $default  reduce using rule 35 (Cmpr)
 
 
 State 42
 
-   25 AndExpr: CmprExpr AND . AndExpr
+   36 Cmpr: NOT_EQUAL .
+
+    $default  reduce using rule 36 (Cmpr)
+
+
+State 43
+
+   28 and: AND .
+
+    $default  reduce using rule 28 (and)
+
+
+State 44
+
+   31 Cmpr: '<' .
+
+    $default  reduce using rule 31 (Cmpr)
+
+
+State 45
+
+   32 Cmpr: '>' .
+
+    $default  reduce using rule 32 (Cmpr)
+
+
+State 46
+
+   26 AndExpr: CmprExpr and . AndExpr
 
     '+'  shift, and go to state 12
     '-'  shift, and go to state 13
     '!'  shift, and go to state 14
 
-    TRUE      reduce using rule 47 (Reverse)
-    FALSE     reduce using rule 47 (Reverse)
-    $default  reduce using rule 45 (SignOpt)
+    TRUE      reduce using rule 52 (Reverse)
+    FALSE     reduce using rule 52 (Reverse)
+    $default  reduce using rule 50 (SignOpt)
 
-    AndExpr   go to state 69
+    AndExpr   go to state 75
     CmprExpr  go to state 22
     AddExpr   go to state 23
     MulExpr   go to state 24
@@ -722,95 +750,20 @@ State 42
     Reverse   go to state 27
 
 
-State 43
-
-   27 CmprExpr: CmprExpr '<' . AddExpr
-
-    '+'  shift, and go to state 12
-    '-'  shift, and go to state 13
-    '!'  shift, and go to state 14
-
-    TRUE      reduce using rule 47 (Reverse)
-    FALSE     reduce using rule 47 (Reverse)
-    $default  reduce using rule 45 (SignOpt)
-
-    AddExpr  go to state 70
-    MulExpr  go to state 24
-    UnaExpr  go to state 25
-    SignOpt  go to state 26
-    Reverse  go to state 27
-
-
-State 44
-
-   28 CmprExpr: CmprExpr '>' . AddExpr
-
-    '+'  shift, and go to state 12
-    '-'  shift, and go to state 13
-    '!'  shift, and go to state 14
-
-    TRUE      reduce using rule 47 (Reverse)
-    FALSE     reduce using rule 47 (Reverse)
-    $default  reduce using rule 45 (SignOpt)
-
-    AddExpr  go to state 71
-    MulExpr  go to state 24
-    UnaExpr  go to state 25
-    SignOpt  go to state 26
-    Reverse  go to state 27
-
-
-State 45
-
-   34 AddExpr: MulExpr '+' . AddExpr
-
-    '+'  shift, and go to state 12
-    '-'  shift, and go to state 13
-    '!'  shift, and go to state 14
-
-    TRUE      reduce using rule 47 (Reverse)
-    FALSE     reduce using rule 47 (Reverse)
-    $default  reduce using rule 45 (SignOpt)
-
-    AddExpr  go to state 72
-    MulExpr  go to state 24
-    UnaExpr  go to state 25
-    SignOpt  go to state 26
-    Reverse  go to state 27
-
-
-State 46
-
-   35 AddExpr: MulExpr '-' . AddExpr
-
-    '+'  shift, and go to state 12
-    '-'  shift, and go to state 13
-    '!'  shift, and go to state 14
-
-    TRUE      reduce using rule 47 (Reverse)
-    FALSE     reduce using rule 47 (Reverse)
-    $default  reduce using rule 45 (SignOpt)
-
-    AddExpr  go to state 73
-    MulExpr  go to state 24
-    UnaExpr  go to state 25
-    SignOpt  go to state 26
-    Reverse  go to state 27
-
-
 State 47
 
-   37 MulExpr: UnaExpr '*' . MulExpr
+   29 CmprExpr: CmprExpr Cmpr . AddExpr
 
     '+'  shift, and go to state 12
     '-'  shift, and go to state 13
     '!'  shift, and go to state 14
 
-    TRUE      reduce using rule 47 (Reverse)
-    FALSE     reduce using rule 47 (Reverse)
-    $default  reduce using rule 45 (SignOpt)
+    TRUE      reduce using rule 52 (Reverse)
+    FALSE     reduce using rule 52 (Reverse)
+    $default  reduce using rule 50 (SignOpt)
 
-    MulExpr  go to state 74
+    AddExpr  go to state 76
+    MulExpr  go to state 24
     UnaExpr  go to state 25
     SignOpt  go to state 26
     Reverse  go to state 27
@@ -818,299 +771,348 @@ State 47
 
 State 48
 
-   38 MulExpr: UnaExpr '/' . MulExpr
+   39 Add: '+' .
 
-    '+'  shift, and go to state 12
-    '-'  shift, and go to state 13
-    '!'  shift, and go to state 14
-
-    TRUE      reduce using rule 47 (Reverse)
-    FALSE     reduce using rule 47 (Reverse)
-    $default  reduce using rule 45 (SignOpt)
-
-    MulExpr  go to state 75
-    UnaExpr  go to state 25
-    SignOpt  go to state 26
-    Reverse  go to state 27
+    $default  reduce using rule 39 (Add)
 
 
 State 49
 
-   39 MulExpr: UnaExpr '%' . MulExpr
+   40 Add: '-' .
+
+    $default  reduce using rule 40 (Add)
+
+
+State 50
+
+   37 AddExpr: MulExpr Add . AddExpr
 
     '+'  shift, and go to state 12
     '-'  shift, and go to state 13
     '!'  shift, and go to state 14
 
-    TRUE      reduce using rule 47 (Reverse)
-    FALSE     reduce using rule 47 (Reverse)
-    $default  reduce using rule 45 (SignOpt)
+    TRUE      reduce using rule 52 (Reverse)
+    FALSE     reduce using rule 52 (Reverse)
+    $default  reduce using rule 50 (SignOpt)
 
-    MulExpr  go to state 76
+    AddExpr  go to state 77
+    MulExpr  go to state 24
     UnaExpr  go to state 25
     SignOpt  go to state 26
     Reverse  go to state 27
 
 
-State 50
+State 51
+
+   43 Mul: '*' .
+
+    $default  reduce using rule 43 (Mul)
+
+
+State 52
+
+   44 Mul: '/' .
+
+    $default  reduce using rule 44 (Mul)
+
+
+State 53
+
+   45 Mul: '%' .
+
+    $default  reduce using rule 45 (Mul)
+
+
+State 54
+
+   41 MulExpr: UnaExpr Mul . MulExpr
+
+    '+'  shift, and go to state 12
+    '-'  shift, and go to state 13
+    '!'  shift, and go to state 14
+
+    TRUE      reduce using rule 52 (Reverse)
+    FALSE     reduce using rule 52 (Reverse)
+    $default  reduce using rule 50 (SignOpt)
+
+    MulExpr  go to state 78
+    UnaExpr  go to state 25
+    SignOpt  go to state 26
+    Reverse  go to state 27
+
+
+State 55
+
+   59 OneArith: INC .
+
+    $default  reduce using rule 59 (OneArith)
+
+
+State 56
+
+   60 OneArith: DEC .
+
+    $default  reduce using rule 60 (OneArith)
+
+
+State 57
 
    21 Literal: INT_LIT .
 
     $default  reduce using rule 21 (Literal)
 
 
-State 51
+State 58
 
    22 Literal: FLOAT_LIT .
 
     $default  reduce using rule 22 (Literal)
 
 
-State 52
-
-   50 Atom: '(' . Expr ')'
-
-    '+'  shift, and go to state 12
-    '-'  shift, and go to state 13
-    '!'  shift, and go to state 14
-
-    TRUE      reduce using rule 47 (Reverse)
-    FALSE     reduce using rule 47 (Reverse)
-    $default  reduce using rule 45 (SignOpt)
-
-    Expr      go to state 77
-    AndExpr   go to state 21
-    CmprExpr  go to state 22
-    AddExpr   go to state 23
-    MulExpr   go to state 24
-    UnaExpr   go to state 25
-    SignOpt   go to state 26
-    Reverse   go to state 27
-
-
-State 53
-
-   51 Atom: '[' . Expr ']'
-
-    '+'  shift, and go to state 12
-    '-'  shift, and go to state 13
-    '!'  shift, and go to state 14
-
-    TRUE      reduce using rule 47 (Reverse)
-    FALSE     reduce using rule 47 (Reverse)
-    $default  reduce using rule 45 (SignOpt)
-
-    Expr      go to state 78
-    AndExpr   go to state 21
-    CmprExpr  go to state 22
-    AddExpr   go to state 23
-    MulExpr   go to state 24
-    UnaExpr   go to state 25
-    SignOpt   go to state 26
-    Reverse   go to state 27
-
-
-State 54
-
-   48 Atom: Ident .
-
-    $default  reduce using rule 48 (Atom)
-
-
-State 55
-
-   49 Atom: Literal .
-
-    $default  reduce using rule 49 (Atom)
-
-
-State 56
-
-   41 UnaExpr: SignOpt Atom .
-
-    $default  reduce using rule 41 (UnaExpr)
-
-
-State 57
-
-   52 Boolean: TRUE .
-
-    $default  reduce using rule 52 (Boolean)
-
-
-State 58
-
-   53 Boolean: FALSE .
-
-    $default  reduce using rule 53 (Boolean)
-
-
 State 59
 
-   42 UnaExpr: Reverse Boolean .
+   58 Atom: '[' . Expr ']'
 
-    $default  reduce using rule 42 (UnaExpr)
+    '+'  shift, and go to state 12
+    '-'  shift, and go to state 13
+    '!'  shift, and go to state 14
+
+    TRUE      reduce using rule 52 (Reverse)
+    FALSE     reduce using rule 52 (Reverse)
+    $default  reduce using rule 50 (SignOpt)
+
+    Expr      go to state 79
+    AndExpr   go to state 21
+    CmprExpr  go to state 22
+    AddExpr   go to state 23
+    MulExpr   go to state 24
+    UnaExpr   go to state 25
+    SignOpt   go to state 26
+    Reverse   go to state 27
 
 
 State 60
 
-   54 PrintStmt: PRINT '(' Expr . ')'
+   65 BracExpr: '(' .
 
-    ')'  shift, and go to state 79
+    $default  reduce using rule 65 (BracExpr)
 
 
 State 61
+
+   66 BracExpr: ')' .
+
+    $default  reduce using rule 66 (BracExpr)
+
+
+State 62
+
+   53 Atom: Ident .
+   54     | Ident . OneArith
+
+    INC  shift, and go to state 55
+    DEC  shift, and go to state 56
+
+    $default  reduce using rule 53 (Atom)
+
+    OneArith  go to state 80
+
+
+State 63
+
+   56 Atom: Literal .
+
+    $default  reduce using rule 56 (Atom)
+
+
+State 64
+
+   46 UnaExpr: SignOpt Atom .
+
+    $default  reduce using rule 46 (UnaExpr)
+
+
+State 65
+
+   55 Atom: OneArith . Ident
+
+    IDENT  shift, and go to state 35
+
+    Ident  go to state 81
+
+
+State 66
+
+   57 Atom: BracExpr . Expr BracExpr
+
+    '+'  shift, and go to state 12
+    '-'  shift, and go to state 13
+    '!'  shift, and go to state 14
+
+    TRUE      reduce using rule 52 (Reverse)
+    FALSE     reduce using rule 52 (Reverse)
+    $default  reduce using rule 50 (SignOpt)
+
+    Expr      go to state 82
+    AndExpr   go to state 21
+    CmprExpr  go to state 22
+    AddExpr   go to state 23
+    MulExpr   go to state 24
+    UnaExpr   go to state 25
+    SignOpt   go to state 26
+    Reverse   go to state 27
+
+
+State 67
+
+   61 Boolean: TRUE .
+
+    $default  reduce using rule 61 (Boolean)
+
+
+State 68
+
+   62 Boolean: FALSE .
+
+    $default  reduce using rule 62 (Boolean)
+
+
+State 69
+
+   47 UnaExpr: Reverse Boolean .
+
+    $default  reduce using rule 47 (UnaExpr)
+
+
+State 70
+
+   63 PrintStmt: PRINT '(' Expr . LeavePrint
+
+    ')'  shift, and go to state 83
+
+    LeavePrint  go to state 84
+
+
+State 71
 
     2 StatementList: Statement ';' StatementList .
 
     $default  reduce using rule 2 (StatementList)
 
 
-State 62
+State 72
 
    19 LitInit: '=' . Literal
 
-    INT_LIT    shift, and go to state 50
-    FLOAT_LIT  shift, and go to state 51
+    INT_LIT    shift, and go to state 57
+    FLOAT_LIT  shift, and go to state 58
 
-    Literal  go to state 80
+    Literal  go to state 85
 
 
-State 63
+State 73
 
    12 DeclarationStmt: Type Ident LitInit .
 
     $default  reduce using rule 12 (DeclarationStmt)
 
 
-State 64
+State 74
 
-   23 Expr: AndExpr OR Expr .
+   23 Expr: AndExpr or Expr .
 
     $default  reduce using rule 23 (Expr)
 
 
-State 65
-
-   30 CmprExpr: CmprExpr BIG_EQU AddExpr .
-
-    $default  reduce using rule 30 (CmprExpr)
-
-
-State 66
-
-   29 CmprExpr: CmprExpr SMALL_EQU AddExpr .
-
-    $default  reduce using rule 29 (CmprExpr)
-
-
-State 67
-
-   31 CmprExpr: CmprExpr EQUAL AddExpr .
-
-    $default  reduce using rule 31 (CmprExpr)
-
-
-State 68
-
-   32 CmprExpr: CmprExpr NOT_EQUAL AddExpr .
-
-    $default  reduce using rule 32 (CmprExpr)
-
-
-State 69
-
-   25 AndExpr: CmprExpr AND AndExpr .
-
-    $default  reduce using rule 25 (AndExpr)
-
-
-State 70
-
-   27 CmprExpr: CmprExpr '<' AddExpr .
-
-    $default  reduce using rule 27 (CmprExpr)
-
-
-State 71
-
-   28 CmprExpr: CmprExpr '>' AddExpr .
-
-    $default  reduce using rule 28 (CmprExpr)
-
-
-State 72
-
-   34 AddExpr: MulExpr '+' AddExpr .
-
-    $default  reduce using rule 34 (AddExpr)
-
-
-State 73
-
-   35 AddExpr: MulExpr '-' AddExpr .
-
-    $default  reduce using rule 35 (AddExpr)
-
-
-State 74
-
-   37 MulExpr: UnaExpr '*' MulExpr .
-
-    $default  reduce using rule 37 (MulExpr)
-
-
 State 75
 
-   38 MulExpr: UnaExpr '/' MulExpr .
+   26 AndExpr: CmprExpr and AndExpr .
 
-    $default  reduce using rule 38 (MulExpr)
+    $default  reduce using rule 26 (AndExpr)
 
 
 State 76
 
-   39 MulExpr: UnaExpr '%' MulExpr .
+   29 CmprExpr: CmprExpr Cmpr AddExpr .
 
-    $default  reduce using rule 39 (MulExpr)
+    $default  reduce using rule 29 (CmprExpr)
 
 
 State 77
 
-   50 Atom: '(' Expr . ')'
+   37 AddExpr: MulExpr Add AddExpr .
 
-    ')'  shift, and go to state 81
+    $default  reduce using rule 37 (AddExpr)
 
 
 State 78
 
-   51 Atom: '[' Expr . ']'
+   41 MulExpr: UnaExpr Mul MulExpr .
 
-    ']'  shift, and go to state 82
+    $default  reduce using rule 41 (MulExpr)
 
 
 State 79
 
-   54 PrintStmt: PRINT '(' Expr ')' .
+   58 Atom: '[' Expr . ']'
 
-    $default  reduce using rule 54 (PrintStmt)
+    ']'  shift, and go to state 86
 
 
 State 80
+
+   54 Atom: Ident OneArith .
+
+    $default  reduce using rule 54 (Atom)
+
+
+State 81
+
+   55 Atom: OneArith Ident .
+
+    $default  reduce using rule 55 (Atom)
+
+
+State 82
+
+   57 Atom: BracExpr Expr . BracExpr
+
+    '('  shift, and go to state 60
+    ')'  shift, and go to state 61
+
+    BracExpr  go to state 87
+
+
+State 83
+
+   64 LeavePrint: ')' .
+
+    $default  reduce using rule 64 (LeavePrint)
+
+
+State 84
+
+   63 PrintStmt: PRINT '(' Expr LeavePrint .
+
+    $default  reduce using rule 63 (PrintStmt)
+
+
+State 85
 
    19 LitInit: '=' Literal .
 
     $default  reduce using rule 19 (LitInit)
 
 
-State 81
+State 86
 
-   50 Atom: '(' Expr ')' .
+   58 Atom: '[' Expr ']' .
 
-    $default  reduce using rule 50 (Atom)
+    $default  reduce using rule 58 (Atom)
 
 
-State 82
+State 87
 
-   51 Atom: '[' Expr ']' .
+   57 Atom: BracExpr Expr BracExpr .
 
-    $default  reduce using rule 51 (Atom)
+    $default  reduce using rule 57 (Atom)

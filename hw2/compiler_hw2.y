@@ -19,14 +19,21 @@
     static void insert_symbol(char *);
     static int lookup_symbol(char *);
     static void dump_symbol(/* ... */);
+    static void precedence(char);
+    static void print_optr(char);
+    static void new_expr();
 
     int declare = 0;
     int scope_level = -1;
     int addr = 0;
     int top = -1;
-    char type[10];
-    char sign[100];
+    char type[10], printype[10];
     table *tb_stack[10];
+
+    char sign[100];
+    char ptable[2][13] = {{'|', '&', '<', '>', 'a', 'b', 'c', 'd', '+', '-', '*', '/', '%'},
+                          {'0', '1', '2', '2', '2', '2', '2', '2', '3', '3', '4', '4', '4'}};
+    estack *exprs;
 %}
 
 %define parse.error verbose
@@ -77,7 +84,8 @@ StatementList
 
 Statement
     : DeclarationStmt 
-    | Expr
+    | Expr {  while(exprs -> top > -1)
+                 print_optr(exprs -> stk[exprs -> top--]); }
     | Block
     | IfStmt
     | LoopStmt
@@ -85,7 +93,8 @@ Statement
 ;
 
 NewScope
-    : { create_symbol(); }
+    : { create_symbol();
+        new_expr(); }
 ;
 
 EndScope
@@ -134,48 +143,71 @@ LitInit
 Literal
     : INT_LIT {
         printf("INT_LIT %d\n", $<i_val>$);
+        strcpy(printype, "int");
     }
     | FLOAT_LIT {
         printf("FLOAT_LIT %f\n", $<f_val>$);
+        strcpy(printype, "float");
     }
 ;
 
+
 Expr
-    : AndExpr OR Expr { printf("OR\n"); }
+    : AndExpr or Expr
     | AndExpr
 ;
 
+or
+    : OR { precedence('|'); }
+;
+
 AndExpr
-    : CmprExpr AND AndExpr { printf("AND\n"); }
+    : CmprExpr and AndExpr
     | CmprExpr
 ;
 
+and
+    : AND { precedence('&'); }
+;
+
 CmprExpr
-    : CmprExpr '<' AddExpr { printf("LSS\n"); }
-    | CmprExpr '>' AddExpr { printf("GTR\n"); }
-    | CmprExpr SMALL_EQU AddExpr { printf("LEQ\n"); }
-    | CmprExpr BIG_EQU AddExpr { printf("GEQ\n"); }
-    | CmprExpr EQUAL AddExpr { printf("EQL\n"); }
-    | CmprExpr NOT_EQUAL AddExpr { printf("NEQ\n"); }
+    : CmprExpr Cmpr AddExpr 
     | AddExpr
 ;
 
+Cmpr
+    : '<' { precedence('<'); }
+    | '>' { precedence('>'); }
+    | SMALL_EQU { precedence('a'); }
+    | BIG_EQU { precedence('b'); }
+    | EQUAL { precedence('c'); }
+    | NOT_EQUAL { precedence('d'); }
+;
+
 AddExpr
-    : MulExpr '+' AddExpr { printf("ADD\n"); }
-    | MulExpr '-' AddExpr { printf("SUB\n"); }
-    | MulExpr
+    : MulExpr Add AddExpr
+    | MulExpr 
+;
+
+Add
+    : '+' { precedence('+'); }
+    | '-' { precedence('-'); }
 ;
 
 MulExpr
-    : UnaExpr '*' MulExpr { printf("MUL\n"); }
-    | UnaExpr '/' MulExpr { printf("QUO\n"); }
-    | UnaExpr '%' MulExpr { printf("REM\n"); }
-    | UnaExpr
+    : UnaExpr Mul MulExpr 
+    | UnaExpr 
+;
+
+Mul
+    : '*' { precedence('*'); }
+    | '/' { precedence('/'); }
+    | '%' { precedence('%'); }
 ;
 
 UnaExpr
-    : SignOpt Atom { printf("%s", sign); }
-    | Reverse Boolean { printf("%s", sign); }
+    : SignOpt Atom { printf("%s", sign); strcpy(sign, ""); }
+    | Reverse Boolean { printf("%s", sign); strcpy(sign, ""); strcpy(printype, "bool"); }
 ;
 
 SignOpt
@@ -187,19 +219,29 @@ SignOpt
                     strcat(s, sign);
                     strcpy(sign, s);
                   }
-    | { strcpy(sign, ""); }
+    |
 ;
 
 Reverse
-    : '!' Reverse { strcat(sign, "NOT\n"); }
-    | { strcpy(sign, ""); }
+    : '!' Reverse { char s[100] = "NOT\n";
+                    strcat(s, sign);
+                    strcpy(sign, s); 
+                  }   
+    | 
 ;
 
 Atom
     : Ident
+    | Ident OneArith
+    | OneArith Ident
     | Literal
-    | '(' Expr ')'
+    | BracExpr Expr BracExpr
     | '[' Expr ']'
+;
+
+OneArith
+    : INC { printf("INC\n"); }
+    | DEC { printf("DEC\n"); }
 ;
 
 Boolean
@@ -208,62 +250,24 @@ Boolean
 ;
 
 PrintStmt
-    : PRINT '(' Expr ')' { ;}
+    : PRINT '(' Expr LeavePrint { printf("PRINT %s\n", printype); }
 ;
 
+LeavePrint
+    : ')' { while(exprs -> top > -1)                                                      
+                 print_optr(exprs -> stk[exprs -> top--]); }
+;
+
+BracExpr
+    : '(' { new_expr(); }
+    | ')' { estack * p = exprs;
+            exprs = exprs -> next;
+            while(p -> top > -1)
+                print_optr(p -> stk[p -> top--]);
+            free(p); }
+;
 
 %%
-/*
-Expr
-    : UnaryExpr ArithExpr
-    | '(' Expr ')' ArithExpr
-;
-
-UnaryExpr
-    : SignOpt Operand UnaryOptr
-;
-
-Operand
-    : Ident
-    | Literal
-;
-
-SignOpt
-    : '+'
-    | '-'
-    | '!'
-    |
-;
-
-UnaryOptr
-    : INC { printf("INC\n"); }
-    | DEC { printf("DEC\n"); }
-    |
-;
-
-ArithExpr
-    : AddExpr
-    | MultiExpr
-    | RemExpr
-    |
-;
-
-AddExpr
-    : '+' Expr { printf("ADD\n"); }
-    | '-' Expr { printf("SUB\n"); }
-;
-
-MultiExpr
-    : '*' Expr { printf("MUL\n"); }
-    | '/' Expr { printf("QUO\n"); }
-;
-
-RemExpr
-    : '%' Expr { printf("REM\n"); }
-;
-
-
-*/
 
 /* C code section */
 static void create_symbol(/* ... */)
@@ -305,6 +309,82 @@ static void dump_symbol(/* ... */)
     }
     free(tb_stack[top]);
     top--;
+}
+
+void new_expr()
+{
+    estack *p = (estack *)malloc(sizeof(estack));
+    memset(p -> stk, '\0', 100);
+    p -> top = -1;
+    p -> next = exprs;
+    exprs = p;
+}
+
+void precedence(char c)
+{
+    if(exprs -> top != -1)
+    {
+        int ci, i;
+        for(int i = 0; i < 13; i++)
+            if(c == ptable[0][i])
+            {
+                ci = ptable[1][i];
+                break;
+            }
+        for(i = 12; ptable[1][i] >= ci; i--)
+            if(exprs -> top > -1 && exprs -> stk[exprs -> top] == ptable[0][i])
+            {
+                print_optr(exprs -> stk[exprs -> top--]);
+                i = 12;
+            }
+    }
+    exprs -> stk[++exprs -> top] = c;
+}
+
+void print_optr(char optr)
+{
+    switch(optr)
+    {
+        case '|':
+            printf("OR\n");
+            break;
+        case '&':
+            printf("AND\n");
+            break;
+        case '<':
+            printf("LSS\n");
+            break;
+        case '>':
+            printf("GTR\n");
+            break;
+        case 'a':
+            printf("LEQ\n");
+            break;
+        case 'b':
+            printf("GEQ\n");
+            break;
+        case 'c':
+            printf("EQL\n");
+            break;
+        case 'd':
+            printf("NEQ\n");
+            break;
+        case '+':
+            printf("ADD\n");
+            break;
+        case '-':
+            printf("SUB\n");
+            break;
+        case '*':
+            printf("MUL\n");
+            break;
+        case '/':
+            printf("QUO\n");
+            break;
+        case '%':
+            printf("REM\n");
+    }
+
 }
 
 int main(int argc, char *argv[])

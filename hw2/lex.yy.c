@@ -1011,23 +1011,22 @@ case 36:
 YY_RULE_SETUP
 #line 77 "compiler_hw2.l"
 { yylval.f_val = atof(yytext);
-              printf("yytext: %s\n", yytext);
                 return FLOAT_LIT;
             }
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 81 "compiler_hw2.l"
+#line 80 "compiler_hw2.l"
 { return INT; }
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 82 "compiler_hw2.l"
+#line 81 "compiler_hw2.l"
 { return FLOAT; }
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 83 "compiler_hw2.l"
+#line 82 "compiler_hw2.l"
 {
               // yylval.ctr.id_name = strdup(yytext);
               if(yylval.s_val)
@@ -1038,19 +1037,19 @@ YY_RULE_SETUP
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 90 "compiler_hw2.l"
+#line 89 "compiler_hw2.l"
 { return ';'; }
 	YY_BREAK
 case 41:
 /* rule 41 can match eol */
 YY_RULE_SETUP
-#line 91 "compiler_hw2.l"
+#line 90 "compiler_hw2.l"
 {;}
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(CMT):
 case YY_STATE_EOF(STR):
-#line 92 "compiler_hw2.l"
+#line 91 "compiler_hw2.l"
 { static int once = 0;
                 if (once++) {
                     yyterminate();
@@ -1059,20 +1058,20 @@ case YY_STATE_EOF(STR):
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 97 "compiler_hw2.l"
+#line 96 "compiler_hw2.l"
 {;}
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 98 "compiler_hw2.l"
+#line 97 "compiler_hw2.l"
 {;}
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
-#line 99 "compiler_hw2.l"
+#line 98 "compiler_hw2.l"
 ECHO;
 	YY_BREAK
-#line 1076 "lex.yy.c"
+#line 1075 "lex.yy.c"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -2087,7 +2086,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 99 "compiler_hw2.l"
+#line 98 "compiler_hw2.l"
 
 /*  C Code section */
 int yywrap(void)

@@ -75,7 +75,6 @@ newline		[\n]
                 return INT_LIT;
             }
 {fnumber}   { yylval.f_val = atof(yytext);
-              printf("yytext: %s\n", yytext);
                 return FLOAT_LIT;
             }
 "int"       { return INT; }
