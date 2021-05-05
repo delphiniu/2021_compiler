@@ -71,10 +71,15 @@ extern int yydebug;
     ELSE = 277,
     WHILE = 278,
     FOR = 279,
-    INT_LIT = 280,
-    FLOAT_LIT = 281,
-    STRING_LIT = 282,
-    IDENT = 283
+    ADD_ASSIGN = 280,
+    SUB_ASSIGN = 281,
+    MUL_ASSIGN = 282,
+    QUO_ASSIGN = 283,
+    REM_ASSIGN = 284,
+    INT_LIT = 285,
+    FLOAT_LIT = 286,
+    STRING_LIT = 287,
+    IDENT = 288
   };
 #endif
 /* Tokens.  */
@@ -100,10 +105,15 @@ extern int yydebug;
 #define ELSE 277
 #define WHILE 278
 #define FOR 279
-#define INT_LIT 280
-#define FLOAT_LIT 281
-#define STRING_LIT 282
-#define IDENT 283
+#define ADD_ASSIGN 280
+#define SUB_ASSIGN 281
+#define MUL_ASSIGN 282
+#define QUO_ASSIGN 283
+#define REM_ASSIGN 284
+#define INT_LIT 285
+#define FLOAT_LIT 286
+#define STRING_LIT 287
+#define IDENT 288
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
@@ -116,7 +126,7 @@ union YYSTYPE
     char *s_val;
     /* ... */
 
-#line 120 "y.tab.h"
+#line 130 "y.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

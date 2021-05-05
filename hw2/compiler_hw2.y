@@ -60,6 +60,7 @@
 %token AND OR
 %token TRUE FALSE
 %token IF ELSE WHILE FOR
+%token ADD_ASSIGN SUB_ASSIGN MUL_ASSIGN QUO_ASSIGN REM_ASSIGN
 
 /* Token with return, which need to specify type */
 %token <i_val> INT_LIT 
@@ -197,6 +198,11 @@ or
 
 Assign
     : '=' Expr LeaveExpr { printf("ASSIGN\n"); }
+    | ADD_ASSIGN  Expr LeaveExpr { printf("ADD_ASSIGN\n"); }
+    | SUB_ASSIGN Expr LeaveExpr { printf("SUB_ASSIGN\n"); }
+    | MUL_ASSIGN Expr LeaveExpr { printf("MUL_ASSIGN\n"); }
+    | QUO_ASSIGN Expr LeaveExpr { printf("QUO_ASSIGN\n"); }
+    | REM_ASSIGN Expr LeaveExpr { printf("REM_ASSIGN\n"); }
     |
 ;
 
