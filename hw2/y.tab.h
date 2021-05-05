@@ -54,32 +54,31 @@ extern int yydebug;
     BOOL = 260,
     STRING = 261,
     SEMICOLON = 262,
-    IfStmt = 263,
-    LoopStmt = 264,
-    PRINT = 265,
-    INC = 266,
-    DEC = 267,
-    BIG_EQU = 268,
-    SMALL_EQU = 269,
-    EQUAL = 270,
-    NOT_EQUAL = 271,
-    AND = 272,
-    OR = 273,
-    TRUE = 274,
-    FALSE = 275,
-    IF = 276,
-    ELSE = 277,
-    WHILE = 278,
-    FOR = 279,
-    ADD_ASSIGN = 280,
-    SUB_ASSIGN = 281,
-    MUL_ASSIGN = 282,
-    QUO_ASSIGN = 283,
-    REM_ASSIGN = 284,
-    INT_LIT = 285,
-    FLOAT_LIT = 286,
-    STRING_LIT = 287,
-    IDENT = 288
+    LoopStmt = 263,
+    PRINT = 264,
+    INC = 265,
+    DEC = 266,
+    BIG_EQU = 267,
+    SMALL_EQU = 268,
+    EQUAL = 269,
+    NOT_EQUAL = 270,
+    AND = 271,
+    OR = 272,
+    TRUE = 273,
+    FALSE = 274,
+    IF = 275,
+    ELSE = 276,
+    WHILE = 277,
+    FOR = 278,
+    ADD_ASSIGN = 279,
+    SUB_ASSIGN = 280,
+    MUL_ASSIGN = 281,
+    QUO_ASSIGN = 282,
+    REM_ASSIGN = 283,
+    INT_LIT = 284,
+    FLOAT_LIT = 285,
+    STRING_LIT = 286,
+    IDENT = 287
   };
 #endif
 /* Tokens.  */
@@ -88,45 +87,44 @@ extern int yydebug;
 #define BOOL 260
 #define STRING 261
 #define SEMICOLON 262
-#define IfStmt 263
-#define LoopStmt 264
-#define PRINT 265
-#define INC 266
-#define DEC 267
-#define BIG_EQU 268
-#define SMALL_EQU 269
-#define EQUAL 270
-#define NOT_EQUAL 271
-#define AND 272
-#define OR 273
-#define TRUE 274
-#define FALSE 275
-#define IF 276
-#define ELSE 277
-#define WHILE 278
-#define FOR 279
-#define ADD_ASSIGN 280
-#define SUB_ASSIGN 281
-#define MUL_ASSIGN 282
-#define QUO_ASSIGN 283
-#define REM_ASSIGN 284
-#define INT_LIT 285
-#define FLOAT_LIT 286
-#define STRING_LIT 287
-#define IDENT 288
+#define LoopStmt 263
+#define PRINT 264
+#define INC 265
+#define DEC 266
+#define BIG_EQU 267
+#define SMALL_EQU 268
+#define EQUAL 269
+#define NOT_EQUAL 270
+#define AND 271
+#define OR 272
+#define TRUE 273
+#define FALSE 274
+#define IF 275
+#define ELSE 276
+#define WHILE 277
+#define FOR 278
+#define ADD_ASSIGN 279
+#define SUB_ASSIGN 280
+#define MUL_ASSIGN 281
+#define QUO_ASSIGN 282
+#define REM_ASSIGN 283
+#define INT_LIT 284
+#define FLOAT_LIT 285
+#define STRING_LIT 286
+#define IDENT 287
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 46 "compiler_hw2.y"
+#line 47 "compiler_hw2.y"
 
     int i_val;
     float f_val;
     char *s_val;
     /* ... */
 
-#line 130 "y.tab.h"
+#line 128 "y.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;
