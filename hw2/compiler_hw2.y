@@ -28,7 +28,7 @@
     int addr = 0;
     int top = -1;
     int parr = 0;
-    char type[10], printype[10];
+    char type[10], printype[10], ctype = '\0';
     char id[10];
     table *tb_stack[10];
 
@@ -131,8 +131,8 @@ Type
 ;
 
 TypeName
-    : INT { strcpy(type, "int"); } 
-    | FLOAT { strcpy(type, "float"); }
+    : INT { strcpy(type, "int"); if(ctype == 'a') ctype ='i'; } 
+    | FLOAT { strcpy(type, "float"); if(ctype == 'a') ctype = 'f'; }
     | STRING { strcpy(type, "string"); }
     | BOOL { strcpy(type, "bool"); }
 ;
@@ -154,6 +154,9 @@ Ident
                     if(t -> stack[i] -> arr)
                         parr = 1;
                     strcpy(printype, t -> stack[i] -> type);
+                    if(ctype)
+                        printf("%c to %c\n", t -> stack[i] -> type[0] - 32, ctype - 32);
+                    ctype = '\0';
                     break;
                 }
             }
@@ -170,13 +173,20 @@ Literal
         printf("INT_LIT %d\n", $<i_val>$);
         if(!parr)
             strcpy(printype, "int");
+        if(ctype)
+            printf("I to %c\n", ctype - 32);
+        ctype = '\0';
     }
     | FLOAT_LIT {
         printf("FLOAT_LIT %f\n", $<f_val>$);
         strcpy(printype, "float");
+        if(ctype)
+            printf("F to %c\n", ctype - 32);
+        ctype = '\0';
     }
     | '"' str '"' { strcpy(printype, "string"); }
 ;
+
 
 str
     : STRING_LIT { printf("STRING_LIT %s\n", $<s_val>$); }
@@ -282,6 +292,12 @@ Atom
     | Literal
     | BracHead Expr BracEnd
     | Ident IndHead Expr IndEnd
+    | EnterCast TypeName ')' Ident
+    | EnterCast TypeName ')' Literal
+;
+
+EnterCast
+    : '(' { ctype = 'a'; }
 ;
 
 OneArith
