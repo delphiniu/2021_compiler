@@ -54,24 +54,27 @@ extern int yydebug;
     BOOL = 260,
     STRING = 261,
     SEMICOLON = 262,
-    Block = 263,
-    IfStmt = 264,
-    LoopStmt = 265,
-    PRINT = 266,
-    INC = 267,
-    DEC = 268,
-    BIG_EQU = 269,
-    SMALL_EQU = 270,
-    EQUAL = 271,
-    NOT_EQUAL = 272,
-    AND = 273,
-    OR = 274,
-    TRUE = 275,
-    FALSE = 276,
-    INT_LIT = 277,
-    FLOAT_LIT = 278,
-    STRING_LIT = 279,
-    IDENT = 280
+    IfStmt = 263,
+    LoopStmt = 264,
+    PRINT = 265,
+    INC = 266,
+    DEC = 267,
+    BIG_EQU = 268,
+    SMALL_EQU = 269,
+    EQUAL = 270,
+    NOT_EQUAL = 271,
+    AND = 272,
+    OR = 273,
+    TRUE = 274,
+    FALSE = 275,
+    IF = 276,
+    ELSE = 277,
+    WHILE = 278,
+    FOR = 279,
+    INT_LIT = 280,
+    FLOAT_LIT = 281,
+    STRING_LIT = 282,
+    IDENT = 283
   };
 #endif
 /* Tokens.  */
@@ -80,37 +83,40 @@ extern int yydebug;
 #define BOOL 260
 #define STRING 261
 #define SEMICOLON 262
-#define Block 263
-#define IfStmt 264
-#define LoopStmt 265
-#define PRINT 266
-#define INC 267
-#define DEC 268
-#define BIG_EQU 269
-#define SMALL_EQU 270
-#define EQUAL 271
-#define NOT_EQUAL 272
-#define AND 273
-#define OR 274
-#define TRUE 275
-#define FALSE 276
-#define INT_LIT 277
-#define FLOAT_LIT 278
-#define STRING_LIT 279
-#define IDENT 280
+#define IfStmt 263
+#define LoopStmt 264
+#define PRINT 265
+#define INC 266
+#define DEC 267
+#define BIG_EQU 268
+#define SMALL_EQU 269
+#define EQUAL 270
+#define NOT_EQUAL 271
+#define AND 272
+#define OR 273
+#define TRUE 274
+#define FALSE 275
+#define IF 276
+#define ELSE 277
+#define WHILE 278
+#define FOR 279
+#define INT_LIT 280
+#define FLOAT_LIT 281
+#define STRING_LIT 282
+#define IDENT 283
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 44 "compiler_hw2.y"
+#line 45 "compiler_hw2.y"
 
     int i_val;
     float f_val;
     char *s_val;
     /* ... */
 
-#line 114 "y.tab.h"
+#line 120 "y.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

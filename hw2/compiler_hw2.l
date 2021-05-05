@@ -67,6 +67,10 @@ newline		[\n]
 "&&"        { return AND; }
 "||"        { return OR; }
 
+"if"        { return IF; }
+"else"      { return ELSE; }
+"while"     { return WHILE; }
+"for"       { return FOR; }
 "print"     { return PRINT; }
 "true"      { return TRUE; }
 "false"     { return FALSE; }
@@ -79,10 +83,12 @@ newline		[\n]
             }
 "int"       { return INT; }
 "float"     { return FLOAT; }
+"string"    { return STRING; }
+"bool"      { return BOOL; }
 {id}        {
               // yylval.ctr.id_name = strdup(yytext);
-              if(yylval.s_val)
-                  free(yylval.s_val);
+              //if(yylval.s_val)
+              //    free(yylval.s_val);
               yylval.s_val = strdup(yytext);
               return IDENT;
             }

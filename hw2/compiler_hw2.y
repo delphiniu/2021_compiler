@@ -28,6 +28,7 @@
     int addr = 0;
     int top = -1;
     char type[10], printype[10];
+    char id[10];
     table *tb_stack[10];
 
     char sign[100];
@@ -51,12 +52,13 @@
 /* Token without return */
 %token INT FLOAT BOOL STRING
 %token SEMICOLON
-%token  Block IfStmt LoopStmt
+%token  IfStmt LoopStmt
 %token PRINT 
 %token INC DEC
 %token BIG_EQU SMALL_EQU EQUAL NOT_EQUAL
 %token AND OR
 %token TRUE FALSE
+%token IF ELSE WHILE FOR
 
 /* Token with return, which need to specify type */
 %token <i_val> INT_LIT 
@@ -74,35 +76,45 @@
 %%
 
 Program
-    : NewScope StatementList EndScope
+    : NewScope StatementList { dump_symbol(); }
 ;
 
 StatementList
     : Statement ';' StatementList
     | Statement ';'
+    | WHILE '(' Expr LeaveExpr ')' NewScope StatementList EndScope StatementList
+    | WHILE '(' Expr LeaveExpr ')' NewScope StatementList EndScope 
+;
+
+
+
+NewScope
+    : '{' { create_symbol(); }
+    | {create_symbol(); new_expr(); }
+;
+
+EndScope
+    : '}' { dump_symbol(); }
 ;
 
 Statement
-    : DeclarationStmt 
-    | Expr {  while(exprs -> top > -1)
-                 print_optr(exprs -> stk[exprs -> top--]); }
-    | Block
+    : DeclarationStmt  
+    | Expr LeaveExpr
     | IfStmt
     | LoopStmt
     | PrintStmt
 ;
 
-NewScope
-    : { create_symbol();
-        new_expr(); }
-;
-
-EndScope
-    : { dump_symbol(); }
-;
 
 DeclarationStmt
-    : Type Ident LitInit
+    : Type Ident LitInit {  if(declare)
+                            {   
+                                insert_symbol(id);
+                                printf("> Insert {%s} into symbol table (scope level: %d)\n", id, scope_level);
+                                declare = 0;
+                            }
+                         }
+    | Type Ident '[' INT_LIT ']'
 ;
 
 Type
@@ -118,13 +130,8 @@ TypeName
 ;
 
 Ident
-    : IDENT { if(declare)
-              {
-                  insert_symbol($<s_val>$);
-                  printf("> Insert {%s} into symbol table (scope level: %d)\n", $<s_val>$, scope_level); 
-                  declare = 0;
-              }
-              else
+    : IDENT { strcpy(id, $<s_val>$);
+              if(!declare)
               {
                   int ad = lookup_symbol($<s_val>$);
                   if(ad == -1)
@@ -137,6 +144,7 @@ Ident
 
 LitInit
     : '=' Literal {}
+    | '=' Boolean { strcpy(printype, "bool"); }
     |
 ;
 
@@ -149,12 +157,21 @@ Literal
         printf("FLOAT_LIT %f\n", $<f_val>$);
         strcpy(printype, "float");
     }
+    | '"' str '"' { strcpy(printype, "string"); }
 ;
 
+str
+    : STRING_LIT { printf("STRING_LIT %s\n", $<s_val>$); }
+;
 
 Expr
     : AndExpr or Expr
     | AndExpr
+;
+
+LeaveExpr
+    : {  while(exprs -> top > -1) 
+                 print_optr(exprs -> stk[exprs -> top--]); }
 ;
 
 or
