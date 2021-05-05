@@ -11,6 +11,7 @@ typedef struct entry{
     char type[10];
     int addr;
     int line;
+    int arr;
 }entry;
 
 typedef struct table{

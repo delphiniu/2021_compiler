@@ -16,7 +16,7 @@
 
     /* Symbol table function - you can add new function if needed. */
     static void create_symbol(/* ... */);
-    static void insert_symbol(char *);
+    static void insert_symbol(char *, int);
     static int lookup_symbol(char *);
     static void dump_symbol(/* ... */);
     static void precedence(char);
@@ -27,6 +27,7 @@
     int scope_level = -1;
     int addr = 0;
     int top = -1;
+    int parr = 0;
     char type[10], printype[10];
     char id[10];
     table *tb_stack[10];
@@ -99,7 +100,7 @@ EndScope
 
 Statement
     : DeclarationStmt  
-    | Expr LeaveExpr
+    | Expr LeaveExpr Assign
     | IfStmt
     | LoopStmt
     | PrintStmt
@@ -109,12 +110,18 @@ Statement
 DeclarationStmt
     : Type Ident LitInit {  if(declare)
                             {   
-                                insert_symbol(id);
+                                insert_symbol(id, 0);
                                 printf("> Insert {%s} into symbol table (scope level: %d)\n", id, scope_level);
                                 declare = 0;
                             }
                          }
-    | Type Ident '[' INT_LIT ']'
+    | Type Ident IndHead Expr IndEnd { if(declare)
+                                   {   
+                                        insert_symbol(id, 1);
+                                        printf("> Insert {%s} into symbol table (scope level: %d)\n", id, scope_level);
+                                        declare = 0;
+                                   }
+                                 }
 ;
 
 Type
@@ -139,6 +146,15 @@ Ident
                   else
                       printf("IDENT (name=%s, address=%d)\n", $<s_val>$, ad);
               }
+              table *t = tb_stack[top];
+              for(int i = 0; i <= t -> top; i++)
+                if(strcmp(t -> stack[i] -> id_name, $<s_val>$) == 0)
+                {
+                    if(t -> stack[i] -> arr)
+                        parr = 1;
+                    strcpy(printype, t -> stack[i] -> type);
+                    break;
+                }
             }
 ;
 
@@ -151,7 +167,8 @@ LitInit
 Literal
     : INT_LIT {
         printf("INT_LIT %d\n", $<i_val>$);
-        strcpy(printype, "int");
+        if(!parr)
+            strcpy(printype, "int");
     }
     | FLOAT_LIT {
         printf("FLOAT_LIT %f\n", $<f_val>$);
@@ -175,7 +192,12 @@ LeaveExpr
 ;
 
 or
-    : OR { precedence('|'); }
+    : OR { precedence('|'); strcpy(printype, "bool"); }
+;
+
+Assign
+    : '=' Expr LeaveExpr { printf("ASSIGN\n"); }
+    |
 ;
 
 AndExpr
@@ -184,7 +206,7 @@ AndExpr
 ;
 
 and
-    : AND { precedence('&'); }
+    : AND { precedence('&'); strcpy(printype, "bool"); }
 ;
 
 CmprExpr
@@ -252,8 +274,8 @@ Atom
     | Ident OneArith
     | OneArith Ident
     | Literal
-    | BracExpr Expr BracExpr
-    | '[' Expr ']'
+    | BracHead Expr BracEnd
+    | Ident IndHead Expr IndEnd
 ;
 
 OneArith
@@ -267,7 +289,7 @@ Boolean
 ;
 
 PrintStmt
-    : PRINT '(' Expr LeavePrint { printf("PRINT %s\n", printype); }
+    : PRINT '(' Expr LeavePrint { printf("PRINT %s\n", printype); parr = 0; }
 ;
 
 LeavePrint
@@ -275,13 +297,27 @@ LeavePrint
                  print_optr(exprs -> stk[exprs -> top--]); }
 ;
 
-BracExpr
+IndHead
+    : '[' { new_expr(); }
+;
+
+IndEnd
+    : ']' { estack * p = exprs;
+          exprs = exprs -> next;
+          while(p -> top > -1) 
+              print_optr(p -> stk[p -> top--]);
+              free(p); }
+;
+
+BracHead
     : '(' { new_expr(); }
-    | ')' { estack * p = exprs;
-            exprs = exprs -> next;
-            while(p -> top > -1)
-                print_optr(p -> stk[p -> top--]);
-            free(p); }
+;
+BracEnd
+    : ')' { estack * p = exprs;
+          exprs = exprs -> next;
+          while(p -> top > -1) 
+              print_optr(p -> stk[p -> top--]);
+              free(p); }
 ;
 
 %%
@@ -294,12 +330,13 @@ static void create_symbol(/* ... */)
     tb_stack[top] -> top = -1;
 }
 
-static void insert_symbol(char *id)
+static void insert_symbol(char *id, int arr)
 {
     int t = ++tb_stack[top] -> top;
     tb_stack[top] -> stack[t] = (entry *)malloc(sizeof(entry));
     tb_stack[top] -> stack[t] -> addr = addr;
     tb_stack[top] -> stack[t] -> line = yylineno;
+    tb_stack[top] -> stack[t] -> arr = arr;
     strcpy(tb_stack[top] -> stack[t] -> id_name, id);
     strcpy(tb_stack[top] -> stack[t] -> type, type);
     addr++;
@@ -321,7 +358,10 @@ static void dump_symbol(/* ... */)
     for(int i = 0; i <= tb_stack[top] -> top; i++)
     {
         entry *e = tb_stack[top] -> stack[i];
-        printf("%-10d%-10s%-10s%-10d%-10d%s\n", i, e -> id_name, e -> type, e -> addr, e -> line, "-");
+        if(!e -> arr)
+            printf("%-10d%-10s%-10s%-10d%-10d%s\n", i, e -> id_name, e -> type, e -> addr, e -> line, "-");
+        else
+            printf("%-10d%-10s%-10s%-10d%-10d%s\n", i, e -> id_name, "array", e -> addr, e -> line, e -> type);
         free(e);
     }
     free(tb_stack[top]);
@@ -336,6 +376,7 @@ void new_expr()
     p -> next = exprs;
     exprs = p;
 }
+
 
 void precedence(char c)
 {
