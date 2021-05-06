@@ -31,11 +31,14 @@
     int top = -1;
     int parr = 0;
     int errcond = 0;
+    int deferr = 0;
+    int rhs = 1;
     char type[10], printype[10], ctype = '\0', asgn = '\0';
     char id[10];
     char check_valid[2][10] = {{'\0'}, {'\0'}};
     table *tb_stack[10];
     char sign[100];
+    char errlhs[7] = "";
     char ptable[2][13] = {{'|', '&', '<', '>', 'a', 'b', 'c', 'd', '+', '-', '*', '/', '%'},
                           {'0', '1', '2', '2', '2', '2', '2', '2', '3', '3', '4', '4', '4'}};
     estack *exprs;
@@ -163,18 +166,23 @@ Ident
               if(!declare)
               {
                   int ad = lookup_symbol($<s_val>$);
-                  if(ad == -1)
-                      printf("error\n");
-                  else
+                  if(ad != -1)
                       printf("IDENT (name=%s, address=%d)\n", $<s_val>$, ad);
               }
-              for(int k = top; k >= 0; k--)
+              int k;
+              for(k = top; k >= 0; k--)
               {
                   table *t = tb_stack[k];
                   int i;
                   for(i = 0; i <= t -> top; i++)
                       if(strcmp(t -> stack[i] -> id_name, $<s_val>$) == 0)
                       {
+                          if(k == top && declare)
+                          {
+                              printf("error:%d: %s redeclared in this block. previous declaration at line %d\n", yylineno, $<s_val>$, t -> stack[i] -> line);
+                              declare = 0;
+                              break;
+                          }
                           if(t -> stack[i] -> arr)
                               parr = 1;
                           strcpy(printype, t -> stack[i] -> type);
@@ -191,6 +199,13 @@ Ident
                   if(i < t -> top + 1)
                   break;
               }
+              if(k < 0 && !declare)
+              {
+                  printf("error:%d: undefined: %s\n", yylineno, $<s_val>$);
+                  deferr = 1;
+              }
+              if(rhs)
+                  strcpy(errlhs, "");
             }
 ;
 
@@ -213,6 +228,8 @@ Literal
         else
             exprs -> nstk[exprs -> top + 1] = 'i';
         ctype = '\0';
+        if(rhs)
+            strcpy(errlhs, "int");
     }
     | FLOAT_LIT {
         printf("FLOAT_LIT %f\n", $<f_val>$);
@@ -225,8 +242,10 @@ Literal
         else
             exprs -> nstk[exprs -> top + 1] = 'f';
         ctype = '\0';
+        if(rhs)
+            strcpy(errlhs, "float");
     }
-    | '"' str '"' { strcpy(printype, "string"); exprs -> nstk[exprs -> top + 1] = 's'; }
+    | '"' str '"' { strcpy(printype, "string"); exprs -> nstk[exprs -> top + 1] = 's'; if(rhs) strcpy(errlhs, "string"); }
 ;
 
 
@@ -250,6 +269,9 @@ LeaveExpr
             if(errcond && exprs -> nstk[0] != 'b')
                 printf("error:%d: non-bool (type %s) used as for condition\n", yylineno + 1, ret_type(exprs -> nstk[0]));
             errcond = 0;
+            if(!rhs)
+                printf("error:%d: cannot assign to %s\n", yylineno, errlhs);
+            rhs = 1;
       }
 ;
 
@@ -258,21 +280,30 @@ or
 ;
 
 Assign
-    : Eq Expr LeaveExpr { if(exprs -> nstk[0] != 's') 
+    : Eq ErrLHS Expr LeaveExpr { if(exprs -> nstk[0] != 's' && !deferr) 
                               type_validation('=', asgn, exprs -> nstk[0]);
                           asgn = '\0';
+                          deferr = 0;
                           printf("ASSIGN\n"); 
+                          strcpy(errlhs, "");
                          }
-    | ADD_ASSIGN  Expr LeaveExpr { printf("ADD_ASSIGN\n"); }
-    | SUB_ASSIGN Expr LeaveExpr { printf("SUB_ASSIGN\n"); }
-    | MUL_ASSIGN Expr LeaveExpr { printf("MUL_ASSIGN\n"); }
-    | QUO_ASSIGN Expr LeaveExpr { printf("QUO_ASSIGN\n"); }
-    | REM_ASSIGN Expr LeaveExpr { printf("REM_ASSIGN\n"); }
+    | ADD_ASSIGN  ErrLHS Expr LeaveExpr { printf("ADD_ASSIGN\n"); strcpy(errlhs, "");}
+    | SUB_ASSIGN ErrLHS Expr LeaveExpr { printf("SUB_ASSIGN\n"); strcpy(errlhs, ""); }
+    | MUL_ASSIGN ErrLHS Expr LeaveExpr { printf("MUL_ASSIGN\n"); strcpy(errlhs, ""); }
+    | QUO_ASSIGN ErrLHS Expr LeaveExpr { printf("QUO_ASSIGN\n"); strcpy(errlhs, ""); }
+    | REM_ASSIGN ErrLHS Expr LeaveExpr { printf("REM_ASSIGN\n"); strcpy(errlhs, ""); }
     | 
 ;
 
 Eq
-    : '=' { asgn = exprs -> nstk[0]; }
+    : '=' { asgn = exprs -> nstk[0]; 
+            }
+;
+
+ErrLHS
+    : { if(strcmp(errlhs, ""))
+            rhs = 0;
+      }
 ;
 
 AndExpr
@@ -391,7 +422,10 @@ IndEnd
           exprs = exprs -> next;
           while(p -> top > -1) 
               print_optr(p -> stk[p -> top--]);
-              free(p); }
+              free(p); 
+            if(rhs)
+                strcpy(errlhs, ""); 
+          }
 ;
 
 BracHead
