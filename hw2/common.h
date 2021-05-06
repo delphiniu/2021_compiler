@@ -23,6 +23,7 @@ typedef struct table{
 typedef struct estack{
     int top;
     char stk[100];
+    char nstk[100];
     struct estack *next;
 }estack;
 

@@ -22,14 +22,16 @@
     static void precedence(char);
     static void print_optr(char);
     static void new_expr();
-    static void type_validation(char);
+    static void type_validation(char, char, char);
+    static char *ret_type(char);
 
     int declare = 0;
     int scope_level = -1;
     int addr = 0;
     int top = -1;
     int parr = 0;
-    char type[10], printype[10], ctype = '\0';
+    int errcond = 0;
+    char type[10], printype[10], ctype = '\0', asgn = '\0';
     char id[10];
     char check_valid[2][10] = {{'\0'}, {'\0'}};
     table *tb_stack[10];
@@ -89,22 +91,26 @@ Start
 StatementList
     : Statement ';' StatementList
     | Statement ';'
-    | WHILE '(' Expr LeaveExpr ')' NewScope StatementList EndScope StatementList
-    | WHILE '(' Expr LeaveExpr ')' NewScope StatementList EndScope 
-    | FOR '(' Expr LeaveExpr Assign ';' Expr LeaveExpr ';' Expr LeaveExpr Assign ')' NewScope StatementList EndScope StatementList
-    | FOR '(' Expr LeaveExpr Assign ';' Expr LeaveExpr ';' Expr LeaveExpr Assign ')' NewScope StatementList EndScope 
+    | WHILE '(' Expr Cond LeaveExpr ')' NewScope StatementList EndScope StatementList
+    | WHILE '(' Expr Cond LeaveExpr ')' NewScope StatementList EndScope 
+    | FOR '(' Expr LeaveExpr Assign ';' Expr Cond LeaveExpr ';' Expr LeaveExpr Assign ')' NewScope StatementList EndScope StatementList
+    | FOR '(' Expr LeaveExpr Assign ';' Expr Cond LeaveExpr ';' Expr LeaveExpr Assign ')' NewScope StatementList EndScope 
     | IfStmt
 ;
 
 IfStmt
-    : IF '(' Expr LeaveExpr ')' NewScope StatementList EndScope ElseStmt StatementList
-    | IF '(' Expr LeaveExpr ')' NewScope StatementList EndScope ElseStmt
+    : IF '(' Expr Cond LeaveExpr ')' NewScope StatementList EndScope ElseStmt StatementList
+    | IF '(' Expr Cond LeaveExpr ')' NewScope StatementList EndScope ElseStmt
 ;
 
 ElseStmt
     : ELSE IF '(' Expr LeaveExpr ')' NewScope StatementList EndScope ElseStmt
     | ELSE NewScope StatementList EndScope
     |
+;
+
+Cond
+    : { errcond = 1; }
 ;
 
 NewScope
@@ -117,7 +123,7 @@ EndScope
 
 Statement
     : DeclarationStmt
-    | Expr LeaveExpr Assign AfterAssign
+    | Expr LeaveExpr Assign
     | LoopStmt
     | PrintStmt
 ;
@@ -162,22 +168,29 @@ Ident
                   else
                       printf("IDENT (name=%s, address=%d)\n", $<s_val>$, ad);
               }
-              table *t = tb_stack[top];
-              for(int i = 0; i <= t -> top; i++)
-                  if(strcmp(t -> stack[i] -> id_name, $<s_val>$) == 0)
-                  {
-                      if(t -> stack[i] -> arr)
-                          parr = 1;
-                      strcpy(printype, t -> stack[i] -> type);
-                      if(ctype)
-                          printf("%c to %c\n", t -> stack[i] -> type[0] - 32, ctype - 32);
-                      ctype = '\0';
-                      if(strcmp(check_valid[0], ""))
-                          strcpy(check_valid[1], t -> stack[i] -> type);
-                      else
-                          strcpy(check_valid[0], t -> stack[i] -> type);
-                      break;
-                  }
+              for(int k = top; k >= 0; k--)
+              {
+                  table *t = tb_stack[k];
+                  int i;
+                  for(i = 0; i <= t -> top; i++)
+                      if(strcmp(t -> stack[i] -> id_name, $<s_val>$) == 0)
+                      {
+                          if(t -> stack[i] -> arr)
+                              parr = 1;
+                          strcpy(printype, t -> stack[i] -> type);
+                          if(ctype)
+                          {
+                              printf("%c to %c\n", t -> stack[i] -> type[0] - 32, ctype - 32);
+                              exprs -> nstk[exprs -> top + 1] = ctype;
+                          }
+                          else
+                              exprs -> nstk[exprs -> top + 1] = t -> stack[i] -> type[0];
+                          ctype = '\0';
+                          break;
+                      }
+                  if(i < t -> top + 1)
+                  break;
+              }
             }
 ;
 
@@ -193,25 +206,27 @@ Literal
         if(!parr)
             strcpy(printype, "int");
         if(ctype)
+        {
             printf("I to %c\n", ctype - 32);
-        ctype = '\0';
-        if(strcmp(check_valid[0], ""))
-            strcpy(check_valid[1], "int");
+            exprs -> nstk[exprs -> top + 1] = ctype;
+        }
         else
-            strcpy(check_valid[0], "int");
+            exprs -> nstk[exprs -> top + 1] = 'i';
+        ctype = '\0';
     }
     | FLOAT_LIT {
         printf("FLOAT_LIT %f\n", $<f_val>$);
         strcpy(printype, "float");
         if(ctype)
+        {
             printf("F to %c\n", ctype - 32);
-        ctype = '\0';
-        if(strcmp(check_valid[0], ""))
-            strcpy(check_valid[1], "float");
+            exprs -> nstk[exprs -> top + 1] = ctype;
+        }
         else
-            strcpy(check_valid[0], "float");
+            exprs -> nstk[exprs -> top + 1] = 'f';
+        ctype = '\0';
     }
-    | '"' str '"' { strcpy(printype, "string"); }
+    | '"' str '"' { strcpy(printype, "string"); exprs -> nstk[exprs -> top + 1] = 's'; }
 ;
 
 
@@ -220,13 +235,21 @@ str
 ;
 
 Expr
-    : AndExpr or Expr { type_validation('|'); strcpy(check_valid[0], check_valid[1]); strcpy(check_valid[1], ""); }
+    : AndExpr or Expr 
     | AndExpr
 ;
 
 LeaveExpr
     : {  while(exprs -> top > -1) 
-                 print_optr(exprs -> stk[exprs -> top--]); 
+         {
+             int k = exprs -> top;
+             type_validation(exprs -> stk[k], exprs -> nstk[k], exprs -> nstk[k + 1]);
+             print_optr(exprs -> stk[exprs -> top--]); 
+         }
+
+            if(errcond && exprs -> nstk[0] != 'b')
+                printf("error:%d: non-bool (type %s) used as for condition\n", yylineno + 1, ret_type(exprs -> nstk[0]));
+            errcond = 0;
       }
 ;
 
@@ -235,7 +258,11 @@ or
 ;
 
 Assign
-    : '=' Expr LeaveExpr { printf("ASSIGN\n"); type_validation('='); }
+    : Eq Expr LeaveExpr { if(exprs -> nstk[0] != 's') 
+                              type_validation('=', asgn, exprs -> nstk[0]);
+                          asgn = '\0';
+                          printf("ASSIGN\n"); 
+                         }
     | ADD_ASSIGN  Expr LeaveExpr { printf("ADD_ASSIGN\n"); }
     | SUB_ASSIGN Expr LeaveExpr { printf("SUB_ASSIGN\n"); }
     | MUL_ASSIGN Expr LeaveExpr { printf("MUL_ASSIGN\n"); }
@@ -244,15 +271,12 @@ Assign
     | 
 ;
 
-AfterAssign
-    : {
-           strcpy(check_valid[0], "");
-           strcpy(check_valid[1], "");
-      }
+Eq
+    : '=' { asgn = exprs -> nstk[0]; }
 ;
 
 AndExpr
-    : CmprExpr and AndExpr { type_validation('&'); }
+    : CmprExpr and AndExpr 
     | CmprExpr
 ;
 
@@ -261,7 +285,7 @@ and
 ;
 
 CmprExpr
-    : CmprExpr Cmpr AddExpr { strcpy(check_valid[0], "bool"); strcpy(check_valid[1], ""); }
+    : CmprExpr Cmpr AddExpr 
     | AddExpr
 ;
 
@@ -275,36 +299,24 @@ Cmpr
 ;
 
 AddExpr
-    : MulExpr Add AddExpr { type_validation('+'); }
-    | MulExpr Sub AddExpr { type_validation('-'); }
+    : MulExpr Add AddExpr 
     | MulExpr 
 ;
 
 Add
     : '+' { precedence('+'); }
-;
-
-Sub
-    : '-' { precedence('-'); }
+    | '-' { precedence('-'); }
 ;
 
 MulExpr
-    : UnaExpr Mul MulExpr { type_validation('*'); }
-    | UnaExpr Quo MulExpr { type_validation('/'); }
-    | UnaExpr Rem MulExpr { type_validation('%'); }
+    : UnaExpr Mul MulExpr 
     | UnaExpr 
 ;
 
 Mul
     : '*' { precedence('*'); }
-;
-
-Quo
-    : '/' { precedence('/'); }
-;
-
-Rem
-    : '%' { precedence('%'); }
+    | '/' { precedence('/'); }
+    | '%' { precedence('%'); }
 ;
 
 UnaExpr
@@ -354,16 +366,10 @@ OneArith
 
 Boolean
     : TRUE { printf("TRUE\n"); 
-             if(strcmp(check_valid[0], ""))
-                 strcpy(check_valid[1], "bool");
-             else
-                 strcpy(check_valid[0], "bool");
+             exprs -> nstk[exprs -> top + 1] = 'b';
            }
     | FALSE { printf("FALSE\n"); 
-              if(strcmp(check_valid[0], ""))
-                  strcpy(check_valid[1], "bool");
-              else
-                  strcpy(check_valid[0], "bool");
+              exprs -> nstk[exprs -> top + 1] = 'b';
             }
 ;
 
@@ -395,8 +401,14 @@ BracEnd
     : ')' { estack * p = exprs;
           exprs = exprs -> next;
           while(p -> top > -1) 
+          {
+              int k = p -> top;
+              type_validation(p -> stk[k], p -> nstk[k], p -> nstk[k + 1]);
               print_optr(p -> stk[p -> top--]);
-              free(p); }
+          }
+          exprs -> nstk[exprs -> top + 1] = p -> nstk[0];
+          free(p); 
+          }
 ;
 
 %%
@@ -447,15 +459,32 @@ static void dump_symbol(/* ... */)
     top--;
 }
 
-void type_validation(char op)
+char *ret_type(char c)
 {
+    switch(c)
+    {
+        case 'i':
+            return "int";
+        case 'f':
+            return "float";
+        case 'b':
+            return "bool";
+    }
+    return NULL;
+}
+
+void type_validation(char op, char fst, char snd)
+{
+    char tp1[6], tp2[6];
+    strcpy(tp1, ret_type(fst));
+    strcpy(tp2, ret_type(snd));
 
     if(op == '%')
     {
-        if(strcmp(check_valid[0], "int"))
-            printf("error:%d: invalid operation: (operator REM not defined on %s)\n", yylineno, check_valid[0]);
-        else if(strcmp(check_valid[1], "int"))
-            printf("error:%d: invalid operation: (operator REM not defined on %s)\n", yylineno, check_valid[1]);
+        if(fst != 'i')
+            printf("error:%d: invalid operation: (operator REM not defined on %s)\n", yylineno, tp1);
+        else if(snd != 'i')
+            printf("error:%d: invalid operation: (operator REM not defined on %s)\n", yylineno, tp2);
     }
     else if(op == '|' || op == '&')
     {
@@ -464,12 +493,12 @@ void type_validation(char op)
             strcpy(s, "OR");
         else if(op == '&')
             strcpy(s, "AND");
-        if(strcmp(check_valid[0], "bool"))
-            printf("error:%d: invalid operation: (operator %s not defined on %s)\n", yylineno, s, check_valid[0]);
-        else if(strcmp(check_valid[1], "bool"))
-            printf("error:%d: invalid operation: (operator %s not defined on %s)\n", yylineno, s, check_valid[1]);
+        if(fst != 'b')
+            printf("error:%d: invalid operation: (operator %s not defined on %s)\n", yylineno, s, tp1);
+        else if(snd != 'b')
+            printf("error:%d: invalid operation: (operator %s not defined on %s)\n", yylineno, s, tp2);
     }
-    else if(strcmp(check_valid[0], check_valid[1]) != 0)
+    else if(fst != snd)
     {
         char s[10];
         switch(op)
@@ -490,17 +519,17 @@ void type_validation(char op)
                 strcpy(s, "ASSIGN");
                 break;
         }
-        printf("error:%d: invalid operation: %s (mismatched types %s and %s)\n", yylineno, s, check_valid[0], check_valid[1]);
+        printf("error:%d: invalid operation: %s (mismatched types %s and %s)\n", yylineno, s, tp1, tp2);
     }
-    else
-        strcpy(check_valid[0], "");
-    
+    else if(op == '<' || op == '>' || op == 'a' || op == 'b' || op == 'c' || op == 'd')
+        exprs -> nstk[exprs -> top] = 'b';
 }
 
 void new_expr()
 {
     estack *p = (estack *)malloc(sizeof(estack));
     memset(p -> stk, '\0', 100);
+    memset(p -> nstk, '\0', 100);
     p -> top = -1;
     p -> next = exprs;
     exprs = p;
@@ -521,6 +550,8 @@ void precedence(char c)
         for(i = 12; ptable[1][i] >= ci; i--)
             if(exprs -> top > -1 && exprs -> stk[exprs -> top] == ptable[0][i])
             {
+                int k = exprs -> top;
+                type_validation(exprs -> stk[k], exprs -> nstk[k], exprs -> nstk[k + 1]);
                 print_optr(exprs -> stk[exprs -> top--]);
                 i = 12;
             }
