@@ -1,0 +1,2585 @@
+Terminals unused in grammar
+
+    SEMICOLON
+
+
+Grammar
+
+    0 $accept: Program $end
+
+    1 Program: Start StatementList
+
+    2 Start: %empty
+
+    3 StatementList: Statement ';' StatementList
+    4              | Statement ';'
+    5              | WHILE '(' InterWhileCond Expr Cond WhileLeaveExpr ')' NewScope StatementList while_end StatementList
+    6              | WHILE '(' InterWhileCond Expr Cond WhileLeaveExpr ')' NewScope StatementList while_end
+    7              | FOR '(' Expr LeaveExpr Assign ';' Expr Cond LeaveExpr ';' Expr LeaveExpr Assign ')' NewScope StatementList EndScope StatementList
+    8              | FOR '(' Expr LeaveExpr Assign ';' Expr Cond LeaveExpr ';' Expr LeaveExpr Assign ')' NewScope StatementList EndScope
+    9              | IfStmt
+
+   10 InterWhileCond: %empty
+
+   11 WhileLeaveExpr: LeaveExpr
+
+   12 while_end: EndScope
+
+   13 IfStmt: IF '(' Expr Cond LeaveExpr ')' NewScope StatementList EndScope ElseStmt StatementList
+   14       | IF '(' Expr Cond LeaveExpr ')' NewScope StatementList EndScope ElseStmt
+
+   15 ElseStmt: ELSE IF '(' Expr LeaveExpr ')' NewScope StatementList EndScope ElseStmt
+   16         | ELSE NewScope StatementList EndScope
+   17         | %empty
+
+   18 Cond: %empty
+
+   19 NewScope: '{'
+
+   20 EndScope: '}'
+
+   21 Statement: DeclarationStmt
+   22          | Expr LeaveExpr Assign
+   23          | LoopStmt
+   24          | PrintStmt
+
+   25 DeclarationStmt: Type Ident LitInit
+   26                | Type Ident IndHead Expr IndEnd
+
+   27 Type: TypeName
+
+   28 TypeName: INT
+   29         | FLOAT
+   30         | STRING
+   31         | BOOL
+
+   32 Ident: IDENT
+
+   33 LitInit: '=' Literal
+   34        | '=' Boolean
+   35        | %empty
+
+   36 Literal: INT_LIT
+   37        | FLOAT_LIT
+   38        | '"' str '"'
+
+   39 str: STRING_LIT
+
+   40 Expr: AndExpr or Expr
+   41     | AndExpr
+
+   42 LeaveExpr: %empty
+
+   43 or: OR
+
+   44 Assign: Eq ErrLHS Expr LeaveExpr
+   45       | ADD_ASSIGN ErrLHS Expr LeaveExpr
+   46       | SUB_ASSIGN ErrLHS Expr LeaveExpr
+   47       | MUL_ASSIGN ErrLHS Expr LeaveExpr
+   48       | QUO_ASSIGN ErrLHS Expr LeaveExpr
+   49       | REM_ASSIGN ErrLHS Expr LeaveExpr
+   50       | %empty
+
+   51 Eq: '='
+
+   52 ErrLHS: %empty
+
+   53 AndExpr: CmprExpr and AndExpr
+   54        | CmprExpr
+
+   55 and: AND
+
+   56 CmprExpr: CmprExpr Cmpr AddExpr
+   57         | AddExpr
+
+   58 Cmpr: '<'
+   59     | '>'
+   60     | SMALL_EQU
+   61     | BIG_EQU
+   62     | EQUAL
+   63     | NOT_EQUAL
+
+   64 AddExpr: MulExpr Add AddExpr
+   65        | MulExpr
+
+   66 Add: '+'
+   67    | '-'
+
+   68 MulExpr: UnaExpr Mul MulExpr
+   69        | UnaExpr
+
+   70 Mul: '*'
+   71    | '/'
+   72    | '%'
+
+   73 UnaExpr: SignOpt Atom
+   74        | Reverse Boolean
+
+   75 SignOpt: '+' SignOpt
+   76        | '-' SignOpt
+   77        | %empty
+
+   78 Reverse: '!' Reverse
+   79        | %empty
+
+   80 Atom: Ident
+   81     | Ident INC
+   82     | Ident DEC
+   83     | INC Ident
+   84     | DEC Ident
+   85     | Literal
+   86     | BracHead Expr BracEnd
+   87     | Ident IndHead Expr IndEnd
+   88     | EnterCast TypeName ')' Ident
+   89     | EnterCast TypeName ')' Literal
+   90     | EnterCast TypeName ')' Ident '[' Literal ']'
+
+   91 EnterCast: '('
+
+   92 Boolean: TRUE
+   93        | FALSE
+
+   94 PrintStmt: PRINT EnterPrint Expr LeavePrint
+
+   95 EnterPrint: '('
+
+   96 LeavePrint: ')'
+
+   97 IndHead: '['
+
+   98 IndEnd: ']'
+
+   99 BracHead: '('
+
+  100 BracEnd: ')'
+
+
+Terminals, with rules where they appear
+
+    $end (0) 0
+    '!' (33) 78
+    '"' (34) 38
+    '%' (37) 72
+    '(' (40) 5 6 7 8 13 14 15 91 95 99
+    ')' (41) 5 6 7 8 13 14 15 88 89 90 96 100
+    '*' (42) 70
+    '+' (43) 66 75
+    '-' (45) 67 76
+    '/' (47) 71
+    ';' (59) 3 4 7 8
+    '<' (60) 58
+    '=' (61) 33 34 51
+    '>' (62) 59
+    '[' (91) 90 97
+    ']' (93) 90 98
+    '{' (123) 19
+    '}' (125) 20
+    error (256)
+    INT (258) 28
+    FLOAT (259) 29
+    BOOL (260) 31
+    STRING (261) 30
+    SEMICOLON (262)
+    LoopStmt (263) 23
+    PRINT (264) 94
+    INC (265) 81 83
+    DEC (266) 82 84
+    BIG_EQU (267) 61
+    SMALL_EQU (268) 60
+    EQUAL (269) 62
+    NOT_EQUAL (270) 63
+    AND (271) 55
+    OR (272) 43
+    TRUE (273) 92
+    FALSE (274) 93
+    IF (275) 13 14 15
+    ELSE (276) 15 16
+    WHILE (277) 5 6
+    FOR (278) 7 8
+    ADD_ASSIGN (279) 45
+    SUB_ASSIGN (280) 46
+    MUL_ASSIGN (281) 47
+    QUO_ASSIGN (282) 48
+    REM_ASSIGN (283) 49
+    INT_LIT <i_val> (284) 36
+    FLOAT_LIT <f_val> (285) 37
+    STRING_LIT <s_val> (286) 39
+    IDENT <s_val> (287) 32
+
+
+Nonterminals, with rules where they appear
+
+    $accept (50)
+        on left: 0
+    Program (51)
+        on left: 1
+        on right: 0
+    Start (52)
+        on left: 2
+        on right: 1
+    StatementList (53)
+        on left: 3 4 5 6 7 8 9
+        on right: 1 3 5 6 7 8 13 14 15 16
+    InterWhileCond (54)
+        on left: 10
+        on right: 5 6
+    WhileLeaveExpr (55)
+        on left: 11
+        on right: 5 6
+    while_end (56)
+        on left: 12
+        on right: 5 6
+    IfStmt (57)
+        on left: 13 14
+        on right: 9
+    ElseStmt (58)
+        on left: 15 16 17
+        on right: 13 14 15
+    Cond (59)
+        on left: 18
+        on right: 5 6 7 8 13 14
+    NewScope (60)
+        on left: 19
+        on right: 5 6 7 8 13 14 15 16
+    EndScope (61)
+        on left: 20
+        on right: 7 8 12 13 14 15 16
+    Statement (62)
+        on left: 21 22 23 24
+        on right: 3 4
+    DeclarationStmt (63)
+        on left: 25 26
+        on right: 21
+    Type (64)
+        on left: 27
+        on right: 25 26
+    TypeName (65)
+        on left: 28 29 30 31
+        on right: 27 88 89 90
+    Ident (66)
+        on left: 32
+        on right: 25 26 80 81 82 83 84 87 88 90
+    LitInit (67)
+        on left: 33 34 35
+        on right: 25
+    Literal (68)
+        on left: 36 37 38
+        on right: 33 85 89 90
+    str (69)
+        on left: 39
+        on right: 38
+    Expr (70)
+        on left: 40 41
+        on right: 5 6 7 8 13 14 15 22 26 40 44 45 46 47 48 49 86 87 94
+    LeaveExpr (71)
+        on left: 42
+        on right: 7 8 11 13 14 15 22 44 45 46 47 48 49
+    or (72)
+        on left: 43
+        on right: 40
+    Assign (73)
+        on left: 44 45 46 47 48 49 50
+        on right: 7 8 22
+    Eq (74)
+        on left: 51
+        on right: 44
+    ErrLHS (75)
+        on left: 52
+        on right: 44 45 46 47 48 49
+    AndExpr (76)
+        on left: 53 54
+        on right: 40 41 53
+    and (77)
+        on left: 55
+        on right: 53
+    CmprExpr (78)
+        on left: 56 57
+        on right: 53 54 56
+    Cmpr (79)
+        on left: 58 59 60 61 62 63
+        on right: 56
+    AddExpr (80)
+        on left: 64 65
+        on right: 56 57 64
+    Add (81)
+        on left: 66 67
+        on right: 64
+    MulExpr (82)
+        on left: 68 69
+        on right: 64 65 68
+    Mul (83)
+        on left: 70 71 72
+        on right: 68
+    UnaExpr (84)
+        on left: 73 74
+        on right: 68 69
+    SignOpt (85)
+        on left: 75 76 77
+        on right: 73 75 76
+    Reverse (86)
+        on left: 78 79
+        on right: 74 78
+    Atom (87)
+        on left: 80 81 82 83 84 85 86 87 88 89 90
+        on right: 73
+    EnterCast (88)
+        on left: 91
+        on right: 88 89 90
+    Boolean (89)
+        on left: 92 93
+        on right: 34 74
+    PrintStmt (90)
+        on left: 94
+        on right: 24
+    EnterPrint (91)
+        on left: 95
+        on right: 94
+    LeavePrint (92)
+        on left: 96
+        on right: 94
+    IndHead (93)
+        on left: 97
+        on right: 26 87
+    IndEnd (94)
+        on left: 98
+        on right: 26 87
+    BracHead (95)
+        on left: 99
+        on right: 86
+    BracEnd (96)
+        on left: 100
+        on right: 86
+
+
+State 0
+
+    0 $accept: . Program $end
+
+    $default  reduce using rule 2 (Start)
+
+    Program  go to state 1
+    Start    go to state 2
+
+
+State 1
+
+    0 $accept: Program . $end
+
+    $end  shift, and go to state 3
+
+
+State 2
+
+    1 Program: Start . StatementList
+
+    INT       shift, and go to state 4
+    FLOAT     shift, and go to state 5
+    BOOL      shift, and go to state 6
+    STRING    shift, and go to state 7
+    LoopStmt  shift, and go to state 8
+    PRINT     shift, and go to state 9
+    IF        shift, and go to state 10
+    WHILE     shift, and go to state 11
+    FOR       shift, and go to state 12
+    '+'       shift, and go to state 13
+    '-'       shift, and go to state 14
+    '!'       shift, and go to state 15
+
+    TRUE      reduce using rule 79 (Reverse)
+    FALSE     reduce using rule 79 (Reverse)
+    $default  reduce using rule 77 (SignOpt)
+
+    StatementList    go to state 16
+    IfStmt           go to state 17
+    Statement        go to state 18
+    DeclarationStmt  go to state 19
+    Type             go to state 20
+    TypeName         go to state 21
+    Expr             go to state 22
+    AndExpr          go to state 23
+    CmprExpr         go to state 24
+    AddExpr          go to state 25
+    MulExpr          go to state 26
+    UnaExpr          go to state 27
+    SignOpt          go to state 28
+    Reverse          go to state 29
+    PrintStmt        go to state 30
+
+
+State 3
+
+    0 $accept: Program $end .
+
+    $default  accept
+
+
+State 4
+
+   28 TypeName: INT .
+
+    $default  reduce using rule 28 (TypeName)
+
+
+State 5
+
+   29 TypeName: FLOAT .
+
+    $default  reduce using rule 29 (TypeName)
+
+
+State 6
+
+   31 TypeName: BOOL .
+
+    $default  reduce using rule 31 (TypeName)
+
+
+State 7
+
+   30 TypeName: STRING .
+
+    $default  reduce using rule 30 (TypeName)
+
+
+State 8
+
+   23 Statement: LoopStmt .
+
+    $default  reduce using rule 23 (Statement)
+
+
+State 9
+
+   94 PrintStmt: PRINT . EnterPrint Expr LeavePrint
+
+    '('  shift, and go to state 31
+
+    EnterPrint  go to state 32
+
+
+State 10
+
+   13 IfStmt: IF . '(' Expr Cond LeaveExpr ')' NewScope StatementList EndScope ElseStmt StatementList
+   14       | IF . '(' Expr Cond LeaveExpr ')' NewScope StatementList EndScope ElseStmt
+
+    '('  shift, and go to state 33
+
+
+State 11
+
+    5 StatementList: WHILE . '(' InterWhileCond Expr Cond WhileLeaveExpr ')' NewScope StatementList while_end StatementList
+    6              | WHILE . '(' InterWhileCond Expr Cond WhileLeaveExpr ')' NewScope StatementList while_end
+
+    '('  shift, and go to state 34
+
+
+State 12
+
+    7 StatementList: FOR . '(' Expr LeaveExpr Assign ';' Expr Cond LeaveExpr ';' Expr LeaveExpr Assign ')' NewScope StatementList EndScope StatementList
+    8              | FOR . '(' Expr LeaveExpr Assign ';' Expr Cond LeaveExpr ';' Expr LeaveExpr Assign ')' NewScope StatementList EndScope
+
+    '('  shift, and go to state 35
+
+
+State 13
+
+   75 SignOpt: '+' . SignOpt
+
+    '+'  shift, and go to state 13
+    '-'  shift, and go to state 14
+
+    $default  reduce using rule 77 (SignOpt)
+
+    SignOpt  go to state 36
+
+
+State 14
+
+   76 SignOpt: '-' . SignOpt
+
+    '+'  shift, and go to state 13
+    '-'  shift, and go to state 14
+
+    $default  reduce using rule 77 (SignOpt)
+
+    SignOpt  go to state 37
+
+
+State 15
+
+   78 Reverse: '!' . Reverse
+
+    '!'  shift, and go to state 15
+
+    $default  reduce using rule 79 (Reverse)
+
+    Reverse  go to state 38
+
+
+State 16
+
+    1 Program: Start StatementList .
+
+    $default  reduce using rule 1 (Program)
+
+
+State 17
+
+    9 StatementList: IfStmt .
+
+    $default  reduce using rule 9 (StatementList)
+
+
+State 18
+
+    3 StatementList: Statement . ';' StatementList
+    4              | Statement . ';'
+
+    ';'  shift, and go to state 39
+
+
+State 19
+
+   21 Statement: DeclarationStmt .
+
+    $default  reduce using rule 21 (Statement)
+
+
+State 20
+
+   25 DeclarationStmt: Type . Ident LitInit
+   26                | Type . Ident IndHead Expr IndEnd
+
+    IDENT  shift, and go to state 40
+
+    Ident  go to state 41
+
+
+State 21
+
+   27 Type: TypeName .
+
+    $default  reduce using rule 27 (Type)
+
+
+State 22
+
+   22 Statement: Expr . LeaveExpr Assign
+
+    $default  reduce using rule 42 (LeaveExpr)
+
+    LeaveExpr  go to state 42
+
+
+State 23
+
+   40 Expr: AndExpr . or Expr
+   41     | AndExpr .
+
+    OR  shift, and go to state 43
+
+    $default  reduce using rule 41 (Expr)
+
+    or  go to state 44
+
+
+State 24
+
+   53 AndExpr: CmprExpr . and AndExpr
+   54        | CmprExpr .
+   56 CmprExpr: CmprExpr . Cmpr AddExpr
+
+    BIG_EQU    shift, and go to state 45
+    SMALL_EQU  shift, and go to state 46
+    EQUAL      shift, and go to state 47
+    NOT_EQUAL  shift, and go to state 48
+    AND        shift, and go to state 49
+    '<'        shift, and go to state 50
+    '>'        shift, and go to state 51
+
+    $default  reduce using rule 54 (AndExpr)
+
+    and   go to state 52
+    Cmpr  go to state 53
+
+
+State 25
+
+   57 CmprExpr: AddExpr .
+
+    $default  reduce using rule 57 (CmprExpr)
+
+
+State 26
+
+   64 AddExpr: MulExpr . Add AddExpr
+   65        | MulExpr .
+
+    '+'  shift, and go to state 54
+    '-'  shift, and go to state 55
+
+    $default  reduce using rule 65 (AddExpr)
+
+    Add  go to state 56
+
+
+State 27
+
+   68 MulExpr: UnaExpr . Mul MulExpr
+   69        | UnaExpr .
+
+    '*'  shift, and go to state 57
+    '/'  shift, and go to state 58
+    '%'  shift, and go to state 59
+
+    $default  reduce using rule 69 (MulExpr)
+
+    Mul  go to state 60
+
+
+State 28
+
+   73 UnaExpr: SignOpt . Atom
+
+    INC        shift, and go to state 61
+    DEC        shift, and go to state 62
+    INT_LIT    shift, and go to state 63
+    FLOAT_LIT  shift, and go to state 64
+    IDENT      shift, and go to state 40
+    '('        shift, and go to state 65
+    '"'        shift, and go to state 66
+
+    Ident      go to state 67
+    Literal    go to state 68
+    Atom       go to state 69
+    EnterCast  go to state 70
+    BracHead   go to state 71
+
+
+State 29
+
+   74 UnaExpr: Reverse . Boolean
+
+    TRUE   shift, and go to state 72
+    FALSE  shift, and go to state 73
+
+    Boolean  go to state 74
+
+
+State 30
+
+   24 Statement: PrintStmt .
+
+    $default  reduce using rule 24 (Statement)
+
+
+State 31
+
+   95 EnterPrint: '(' .
+
+    $default  reduce using rule 95 (EnterPrint)
+
+
+State 32
+
+   94 PrintStmt: PRINT EnterPrint . Expr LeavePrint
+
+    '+'  shift, and go to state 13
+    '-'  shift, and go to state 14
+    '!'  shift, and go to state 15
+
+    TRUE      reduce using rule 79 (Reverse)
+    FALSE     reduce using rule 79 (Reverse)
+    $default  reduce using rule 77 (SignOpt)
+
+    Expr      go to state 75
+    AndExpr   go to state 23
+    CmprExpr  go to state 24
+    AddExpr   go to state 25
+    MulExpr   go to state 26
+    UnaExpr   go to state 27
+    SignOpt   go to state 28
+    Reverse   go to state 29
+
+
+State 33
+
+   13 IfStmt: IF '(' . Expr Cond LeaveExpr ')' NewScope StatementList EndScope ElseStmt StatementList
+   14       | IF '(' . Expr Cond LeaveExpr ')' NewScope StatementList EndScope ElseStmt
+
+    '+'  shift, and go to state 13
+    '-'  shift, and go to state 14
+    '!'  shift, and go to state 15
+
+    TRUE      reduce using rule 79 (Reverse)
+    FALSE     reduce using rule 79 (Reverse)
+    $default  reduce using rule 77 (SignOpt)
+
+    Expr      go to state 76
+    AndExpr   go to state 23
+    CmprExpr  go to state 24
+    AddExpr   go to state 25
+    MulExpr   go to state 26
+    UnaExpr   go to state 27
+    SignOpt   go to state 28
+    Reverse   go to state 29
+
+
+State 34
+
+    5 StatementList: WHILE '(' . InterWhileCond Expr Cond WhileLeaveExpr ')' NewScope StatementList while_end StatementList
+    6              | WHILE '(' . InterWhileCond Expr Cond WhileLeaveExpr ')' NewScope StatementList while_end
+
+    $default  reduce using rule 10 (InterWhileCond)
+
+    InterWhileCond  go to state 77
+
+
+State 35
+
+    7 StatementList: FOR '(' . Expr LeaveExpr Assign ';' Expr Cond LeaveExpr ';' Expr LeaveExpr Assign ')' NewScope StatementList EndScope StatementList
+    8              | FOR '(' . Expr LeaveExpr Assign ';' Expr Cond LeaveExpr ';' Expr LeaveExpr Assign ')' NewScope StatementList EndScope
+
+    '+'  shift, and go to state 13
+    '-'  shift, and go to state 14
+    '!'  shift, and go to state 15
+
+    TRUE      reduce using rule 79 (Reverse)
+    FALSE     reduce using rule 79 (Reverse)
+    $default  reduce using rule 77 (SignOpt)
+
+    Expr      go to state 78
+    AndExpr   go to state 23
+    CmprExpr  go to state 24
+    AddExpr   go to state 25
+    MulExpr   go to state 26
+    UnaExpr   go to state 27
+    SignOpt   go to state 28
+    Reverse   go to state 29
+
+
+State 36
+
+   75 SignOpt: '+' SignOpt .
+
+    $default  reduce using rule 75 (SignOpt)
+
+
+State 37
+
+   76 SignOpt: '-' SignOpt .
+
+    $default  reduce using rule 76 (SignOpt)
+
+
+State 38
+
+   78 Reverse: '!' Reverse .
+
+    $default  reduce using rule 78 (Reverse)
+
+
+State 39
+
+    3 StatementList: Statement ';' . StatementList
+    4              | Statement ';' .
+
+    INT       shift, and go to state 4
+    FLOAT     shift, and go to state 5
+    BOOL      shift, and go to state 6
+    STRING    shift, and go to state 7
+    LoopStmt  shift, and go to state 8
+    PRINT     shift, and go to state 9
+    IF        shift, and go to state 10
+    WHILE     shift, and go to state 11
+    FOR       shift, and go to state 12
+    '+'       shift, and go to state 13
+    '-'       shift, and go to state 14
+    '!'       shift, and go to state 15
+
+    $end      reduce using rule 4 (StatementList)
+    TRUE      reduce using rule 79 (Reverse)
+    FALSE     reduce using rule 79 (Reverse)
+    '}'       reduce using rule 4 (StatementList)
+    $default  reduce using rule 77 (SignOpt)
+
+    StatementList    go to state 79
+    IfStmt           go to state 17
+    Statement        go to state 18
+    DeclarationStmt  go to state 19
+    Type             go to state 20
+    TypeName         go to state 21
+    Expr             go to state 22
+    AndExpr          go to state 23
+    CmprExpr         go to state 24
+    AddExpr          go to state 25
+    MulExpr          go to state 26
+    UnaExpr          go to state 27
+    SignOpt          go to state 28
+    Reverse          go to state 29
+    PrintStmt        go to state 30
+
+
+State 40
+
+   32 Ident: IDENT .
+
+    $default  reduce using rule 32 (Ident)
+
+
+State 41
+
+   25 DeclarationStmt: Type Ident . LitInit
+   26                | Type Ident . IndHead Expr IndEnd
+
+    '='  shift, and go to state 80
+    '['  shift, and go to state 81
+
+    $default  reduce using rule 35 (LitInit)
+
+    LitInit  go to state 82
+    IndHead  go to state 83
+
+
+State 42
+
+   22 Statement: Expr LeaveExpr . Assign
+
+    ADD_ASSIGN  shift, and go to state 84
+    SUB_ASSIGN  shift, and go to state 85
+    MUL_ASSIGN  shift, and go to state 86
+    QUO_ASSIGN  shift, and go to state 87
+    REM_ASSIGN  shift, and go to state 88
+    '='         shift, and go to state 89
+
+    $default  reduce using rule 50 (Assign)
+
+    Assign  go to state 90
+    Eq      go to state 91
+
+
+State 43
+
+   43 or: OR .
+
+    $default  reduce using rule 43 (or)
+
+
+State 44
+
+   40 Expr: AndExpr or . Expr
+
+    '+'  shift, and go to state 13
+    '-'  shift, and go to state 14
+    '!'  shift, and go to state 15
+
+    TRUE      reduce using rule 79 (Reverse)
+    FALSE     reduce using rule 79 (Reverse)
+    $default  reduce using rule 77 (SignOpt)
+
+    Expr      go to state 92
+    AndExpr   go to state 23
+    CmprExpr  go to state 24
+    AddExpr   go to state 25
+    MulExpr   go to state 26
+    UnaExpr   go to state 27
+    SignOpt   go to state 28
+    Reverse   go to state 29
+
+
+State 45
+
+   61 Cmpr: BIG_EQU .
+
+    $default  reduce using rule 61 (Cmpr)
+
+
+State 46
+
+   60 Cmpr: SMALL_EQU .
+
+    $default  reduce using rule 60 (Cmpr)
+
+
+State 47
+
+   62 Cmpr: EQUAL .
+
+    $default  reduce using rule 62 (Cmpr)
+
+
+State 48
+
+   63 Cmpr: NOT_EQUAL .
+
+    $default  reduce using rule 63 (Cmpr)
+
+
+State 49
+
+   55 and: AND .
+
+    $default  reduce using rule 55 (and)
+
+
+State 50
+
+   58 Cmpr: '<' .
+
+    $default  reduce using rule 58 (Cmpr)
+
+
+State 51
+
+   59 Cmpr: '>' .
+
+    $default  reduce using rule 59 (Cmpr)
+
+
+State 52
+
+   53 AndExpr: CmprExpr and . AndExpr
+
+    '+'  shift, and go to state 13
+    '-'  shift, and go to state 14
+    '!'  shift, and go to state 15
+
+    TRUE      reduce using rule 79 (Reverse)
+    FALSE     reduce using rule 79 (Reverse)
+    $default  reduce using rule 77 (SignOpt)
+
+    AndExpr   go to state 93
+    CmprExpr  go to state 24
+    AddExpr   go to state 25
+    MulExpr   go to state 26
+    UnaExpr   go to state 27
+    SignOpt   go to state 28
+    Reverse   go to state 29
+
+
+State 53
+
+   56 CmprExpr: CmprExpr Cmpr . AddExpr
+
+    '+'  shift, and go to state 13
+    '-'  shift, and go to state 14
+    '!'  shift, and go to state 15
+
+    TRUE      reduce using rule 79 (Reverse)
+    FALSE     reduce using rule 79 (Reverse)
+    $default  reduce using rule 77 (SignOpt)
+
+    AddExpr  go to state 94
+    MulExpr  go to state 26
+    UnaExpr  go to state 27
+    SignOpt  go to state 28
+    Reverse  go to state 29
+
+
+State 54
+
+   66 Add: '+' .
+
+    $default  reduce using rule 66 (Add)
+
+
+State 55
+
+   67 Add: '-' .
+
+    $default  reduce using rule 67 (Add)
+
+
+State 56
+
+   64 AddExpr: MulExpr Add . AddExpr
+
+    '+'  shift, and go to state 13
+    '-'  shift, and go to state 14
+    '!'  shift, and go to state 15
+
+    TRUE      reduce using rule 79 (Reverse)
+    FALSE     reduce using rule 79 (Reverse)
+    $default  reduce using rule 77 (SignOpt)
+
+    AddExpr  go to state 95
+    MulExpr  go to state 26
+    UnaExpr  go to state 27
+    SignOpt  go to state 28
+    Reverse  go to state 29
+
+
+State 57
+
+   70 Mul: '*' .
+
+    $default  reduce using rule 70 (Mul)
+
+
+State 58
+
+   71 Mul: '/' .
+
+    $default  reduce using rule 71 (Mul)
+
+
+State 59
+
+   72 Mul: '%' .
+
+    $default  reduce using rule 72 (Mul)
+
+
+State 60
+
+   68 MulExpr: UnaExpr Mul . MulExpr
+
+    '+'  shift, and go to state 13
+    '-'  shift, and go to state 14
+    '!'  shift, and go to state 15
+
+    TRUE      reduce using rule 79 (Reverse)
+    FALSE     reduce using rule 79 (Reverse)
+    $default  reduce using rule 77 (SignOpt)
+
+    MulExpr  go to state 96
+    UnaExpr  go to state 27
+    SignOpt  go to state 28
+    Reverse  go to state 29
+
+
+State 61
+
+   83 Atom: INC . Ident
+
+    IDENT  shift, and go to state 40
+
+    Ident  go to state 97
+
+
+State 62
+
+   84 Atom: DEC . Ident
+
+    IDENT  shift, and go to state 40
+
+    Ident  go to state 98
+
+
+State 63
+
+   36 Literal: INT_LIT .
+
+    $default  reduce using rule 36 (Literal)
+
+
+State 64
+
+   37 Literal: FLOAT_LIT .
+
+    $default  reduce using rule 37 (Literal)
+
+
+State 65
+
+   91 EnterCast: '(' .
+   99 BracHead: '(' .
+
+    INT       reduce using rule 91 (EnterCast)
+    FLOAT     reduce using rule 91 (EnterCast)
+    BOOL      reduce using rule 91 (EnterCast)
+    STRING    reduce using rule 91 (EnterCast)
+    $default  reduce using rule 99 (BracHead)
+
+
+State 66
+
+   38 Literal: '"' . str '"'
+
+    STRING_LIT  shift, and go to state 99
+
+    str  go to state 100
+
+
+State 67
+
+   80 Atom: Ident .
+   81     | Ident . INC
+   82     | Ident . DEC
+   87     | Ident . IndHead Expr IndEnd
+
+    INC  shift, and go to state 101
+    DEC  shift, and go to state 102
+    '['  shift, and go to state 81
+
+    $default  reduce using rule 80 (Atom)
+
+    IndHead  go to state 103
+
+
+State 68
+
+   85 Atom: Literal .
+
+    $default  reduce using rule 85 (Atom)
+
+
+State 69
+
+   73 UnaExpr: SignOpt Atom .
+
+    $default  reduce using rule 73 (UnaExpr)
+
+
+State 70
+
+   88 Atom: EnterCast . TypeName ')' Ident
+   89     | EnterCast . TypeName ')' Literal
+   90     | EnterCast . TypeName ')' Ident '[' Literal ']'
+
+    INT     shift, and go to state 4
+    FLOAT   shift, and go to state 5
+    BOOL    shift, and go to state 6
+    STRING  shift, and go to state 7
+
+    TypeName  go to state 104
+
+
+State 71
+
+   86 Atom: BracHead . Expr BracEnd
+
+    '+'  shift, and go to state 13
+    '-'  shift, and go to state 14
+    '!'  shift, and go to state 15
+
+    TRUE      reduce using rule 79 (Reverse)
+    FALSE     reduce using rule 79 (Reverse)
+    $default  reduce using rule 77 (SignOpt)
+
+    Expr      go to state 105
+    AndExpr   go to state 23
+    CmprExpr  go to state 24
+    AddExpr   go to state 25
+    MulExpr   go to state 26
+    UnaExpr   go to state 27
+    SignOpt   go to state 28
+    Reverse   go to state 29
+
+
+State 72
+
+   92 Boolean: TRUE .
+
+    $default  reduce using rule 92 (Boolean)
+
+
+State 73
+
+   93 Boolean: FALSE .
+
+    $default  reduce using rule 93 (Boolean)
+
+
+State 74
+
+   74 UnaExpr: Reverse Boolean .
+
+    $default  reduce using rule 74 (UnaExpr)
+
+
+State 75
+
+   94 PrintStmt: PRINT EnterPrint Expr . LeavePrint
+
+    ')'  shift, and go to state 106
+
+    LeavePrint  go to state 107
+
+
+State 76
+
+   13 IfStmt: IF '(' Expr . Cond LeaveExpr ')' NewScope StatementList EndScope ElseStmt StatementList
+   14       | IF '(' Expr . Cond LeaveExpr ')' NewScope StatementList EndScope ElseStmt
+
+    $default  reduce using rule 18 (Cond)
+
+    Cond  go to state 108
+
+
+State 77
+
+    5 StatementList: WHILE '(' InterWhileCond . Expr Cond WhileLeaveExpr ')' NewScope StatementList while_end StatementList
+    6              | WHILE '(' InterWhileCond . Expr Cond WhileLeaveExpr ')' NewScope StatementList while_end
+
+    '+'  shift, and go to state 13
+    '-'  shift, and go to state 14
+    '!'  shift, and go to state 15
+
+    TRUE      reduce using rule 79 (Reverse)
+    FALSE     reduce using rule 79 (Reverse)
+    $default  reduce using rule 77 (SignOpt)
+
+    Expr      go to state 109
+    AndExpr   go to state 23
+    CmprExpr  go to state 24
+    AddExpr   go to state 25
+    MulExpr   go to state 26
+    UnaExpr   go to state 27
+    SignOpt   go to state 28
+    Reverse   go to state 29
+
+
+State 78
+
+    7 StatementList: FOR '(' Expr . LeaveExpr Assign ';' Expr Cond LeaveExpr ';' Expr LeaveExpr Assign ')' NewScope StatementList EndScope StatementList
+    8              | FOR '(' Expr . LeaveExpr Assign ';' Expr Cond LeaveExpr ';' Expr LeaveExpr Assign ')' NewScope StatementList EndScope
+
+    $default  reduce using rule 42 (LeaveExpr)
+
+    LeaveExpr  go to state 110
+
+
+State 79
+
+    3 StatementList: Statement ';' StatementList .
+
+    $default  reduce using rule 3 (StatementList)
+
+
+State 80
+
+   33 LitInit: '=' . Literal
+   34        | '=' . Boolean
+
+    TRUE       shift, and go to state 72
+    FALSE      shift, and go to state 73
+    INT_LIT    shift, and go to state 63
+    FLOAT_LIT  shift, and go to state 64
+    '"'        shift, and go to state 66
+
+    Literal  go to state 111
+    Boolean  go to state 112
+
+
+State 81
+
+   97 IndHead: '[' .
+
+    $default  reduce using rule 97 (IndHead)
+
+
+State 82
+
+   25 DeclarationStmt: Type Ident LitInit .
+
+    $default  reduce using rule 25 (DeclarationStmt)
+
+
+State 83
+
+   26 DeclarationStmt: Type Ident IndHead . Expr IndEnd
+
+    '+'  shift, and go to state 13
+    '-'  shift, and go to state 14
+    '!'  shift, and go to state 15
+
+    TRUE      reduce using rule 79 (Reverse)
+    FALSE     reduce using rule 79 (Reverse)
+    $default  reduce using rule 77 (SignOpt)
+
+    Expr      go to state 113
+    AndExpr   go to state 23
+    CmprExpr  go to state 24
+    AddExpr   go to state 25
+    MulExpr   go to state 26
+    UnaExpr   go to state 27
+    SignOpt   go to state 28
+    Reverse   go to state 29
+
+
+State 84
+
+   45 Assign: ADD_ASSIGN . ErrLHS Expr LeaveExpr
+
+    $default  reduce using rule 52 (ErrLHS)
+
+    ErrLHS  go to state 114
+
+
+State 85
+
+   46 Assign: SUB_ASSIGN . ErrLHS Expr LeaveExpr
+
+    $default  reduce using rule 52 (ErrLHS)
+
+    ErrLHS  go to state 115
+
+
+State 86
+
+   47 Assign: MUL_ASSIGN . ErrLHS Expr LeaveExpr
+
+    $default  reduce using rule 52 (ErrLHS)
+
+    ErrLHS  go to state 116
+
+
+State 87
+
+   48 Assign: QUO_ASSIGN . ErrLHS Expr LeaveExpr
+
+    $default  reduce using rule 52 (ErrLHS)
+
+    ErrLHS  go to state 117
+
+
+State 88
+
+   49 Assign: REM_ASSIGN . ErrLHS Expr LeaveExpr
+
+    $default  reduce using rule 52 (ErrLHS)
+
+    ErrLHS  go to state 118
+
+
+State 89
+
+   51 Eq: '=' .
+
+    $default  reduce using rule 51 (Eq)
+
+
+State 90
+
+   22 Statement: Expr LeaveExpr Assign .
+
+    $default  reduce using rule 22 (Statement)
+
+
+State 91
+
+   44 Assign: Eq . ErrLHS Expr LeaveExpr
+
+    $default  reduce using rule 52 (ErrLHS)
+
+    ErrLHS  go to state 119
+
+
+State 92
+
+   40 Expr: AndExpr or Expr .
+
+    $default  reduce using rule 40 (Expr)
+
+
+State 93
+
+   53 AndExpr: CmprExpr and AndExpr .
+
+    $default  reduce using rule 53 (AndExpr)
+
+
+State 94
+
+   56 CmprExpr: CmprExpr Cmpr AddExpr .
+
+    $default  reduce using rule 56 (CmprExpr)
+
+
+State 95
+
+   64 AddExpr: MulExpr Add AddExpr .
+
+    $default  reduce using rule 64 (AddExpr)
+
+
+State 96
+
+   68 MulExpr: UnaExpr Mul MulExpr .
+
+    $default  reduce using rule 68 (MulExpr)
+
+
+State 97
+
+   83 Atom: INC Ident .
+
+    $default  reduce using rule 83 (Atom)
+
+
+State 98
+
+   84 Atom: DEC Ident .
+
+    $default  reduce using rule 84 (Atom)
+
+
+State 99
+
+   39 str: STRING_LIT .
+
+    $default  reduce using rule 39 (str)
+
+
+State 100
+
+   38 Literal: '"' str . '"'
+
+    '"'  shift, and go to state 120
+
+
+State 101
+
+   81 Atom: Ident INC .
+
+    $default  reduce using rule 81 (Atom)
+
+
+State 102
+
+   82 Atom: Ident DEC .
+
+    $default  reduce using rule 82 (Atom)
+
+
+State 103
+
+   87 Atom: Ident IndHead . Expr IndEnd
+
+    '+'  shift, and go to state 13
+    '-'  shift, and go to state 14
+    '!'  shift, and go to state 15
+
+    TRUE      reduce using rule 79 (Reverse)
+    FALSE     reduce using rule 79 (Reverse)
+    $default  reduce using rule 77 (SignOpt)
+
+    Expr      go to state 121
+    AndExpr   go to state 23
+    CmprExpr  go to state 24
+    AddExpr   go to state 25
+    MulExpr   go to state 26
+    UnaExpr   go to state 27
+    SignOpt   go to state 28
+    Reverse   go to state 29
+
+
+State 104
+
+   88 Atom: EnterCast TypeName . ')' Ident
+   89     | EnterCast TypeName . ')' Literal
+   90     | EnterCast TypeName . ')' Ident '[' Literal ']'
+
+    ')'  shift, and go to state 122
+
+
+State 105
+
+   86 Atom: BracHead Expr . BracEnd
+
+    ')'  shift, and go to state 123
+
+    BracEnd  go to state 124
+
+
+State 106
+
+   96 LeavePrint: ')' .
+
+    $default  reduce using rule 96 (LeavePrint)
+
+
+State 107
+
+   94 PrintStmt: PRINT EnterPrint Expr LeavePrint .
+
+    $default  reduce using rule 94 (PrintStmt)
+
+
+State 108
+
+   13 IfStmt: IF '(' Expr Cond . LeaveExpr ')' NewScope StatementList EndScope ElseStmt StatementList
+   14       | IF '(' Expr Cond . LeaveExpr ')' NewScope StatementList EndScope ElseStmt
+
+    $default  reduce using rule 42 (LeaveExpr)
+
+    LeaveExpr  go to state 125
+
+
+State 109
+
+    5 StatementList: WHILE '(' InterWhileCond Expr . Cond WhileLeaveExpr ')' NewScope StatementList while_end StatementList
+    6              | WHILE '(' InterWhileCond Expr . Cond WhileLeaveExpr ')' NewScope StatementList while_end
+
+    $default  reduce using rule 18 (Cond)
+
+    Cond  go to state 126
+
+
+State 110
+
+    7 StatementList: FOR '(' Expr LeaveExpr . Assign ';' Expr Cond LeaveExpr ';' Expr LeaveExpr Assign ')' NewScope StatementList EndScope StatementList
+    8              | FOR '(' Expr LeaveExpr . Assign ';' Expr Cond LeaveExpr ';' Expr LeaveExpr Assign ')' NewScope StatementList EndScope
+
+    ADD_ASSIGN  shift, and go to state 84
+    SUB_ASSIGN  shift, and go to state 85
+    MUL_ASSIGN  shift, and go to state 86
+    QUO_ASSIGN  shift, and go to state 87
+    REM_ASSIGN  shift, and go to state 88
+    '='         shift, and go to state 89
+
+    $default  reduce using rule 50 (Assign)
+
+    Assign  go to state 127
+    Eq      go to state 91
+
+
+State 111
+
+   33 LitInit: '=' Literal .
+
+    $default  reduce using rule 33 (LitInit)
+
+
+State 112
+
+   34 LitInit: '=' Boolean .
+
+    $default  reduce using rule 34 (LitInit)
+
+
+State 113
+
+   26 DeclarationStmt: Type Ident IndHead Expr . IndEnd
+
+    ']'  shift, and go to state 128
+
+    IndEnd  go to state 129
+
+
+State 114
+
+   45 Assign: ADD_ASSIGN ErrLHS . Expr LeaveExpr
+
+    '+'  shift, and go to state 13
+    '-'  shift, and go to state 14
+    '!'  shift, and go to state 15
+
+    TRUE      reduce using rule 79 (Reverse)
+    FALSE     reduce using rule 79 (Reverse)
+    $default  reduce using rule 77 (SignOpt)
+
+    Expr      go to state 130
+    AndExpr   go to state 23
+    CmprExpr  go to state 24
+    AddExpr   go to state 25
+    MulExpr   go to state 26
+    UnaExpr   go to state 27
+    SignOpt   go to state 28
+    Reverse   go to state 29
+
+
+State 115
+
+   46 Assign: SUB_ASSIGN ErrLHS . Expr LeaveExpr
+
+    '+'  shift, and go to state 13
+    '-'  shift, and go to state 14
+    '!'  shift, and go to state 15
+
+    TRUE      reduce using rule 79 (Reverse)
+    FALSE     reduce using rule 79 (Reverse)
+    $default  reduce using rule 77 (SignOpt)
+
+    Expr      go to state 131
+    AndExpr   go to state 23
+    CmprExpr  go to state 24
+    AddExpr   go to state 25
+    MulExpr   go to state 26
+    UnaExpr   go to state 27
+    SignOpt   go to state 28
+    Reverse   go to state 29
+
+
+State 116
+
+   47 Assign: MUL_ASSIGN ErrLHS . Expr LeaveExpr
+
+    '+'  shift, and go to state 13
+    '-'  shift, and go to state 14
+    '!'  shift, and go to state 15
+
+    TRUE      reduce using rule 79 (Reverse)
+    FALSE     reduce using rule 79 (Reverse)
+    $default  reduce using rule 77 (SignOpt)
+
+    Expr      go to state 132
+    AndExpr   go to state 23
+    CmprExpr  go to state 24
+    AddExpr   go to state 25
+    MulExpr   go to state 26
+    UnaExpr   go to state 27
+    SignOpt   go to state 28
+    Reverse   go to state 29
+
+
+State 117
+
+   48 Assign: QUO_ASSIGN ErrLHS . Expr LeaveExpr
+
+    '+'  shift, and go to state 13
+    '-'  shift, and go to state 14
+    '!'  shift, and go to state 15
+
+    TRUE      reduce using rule 79 (Reverse)
+    FALSE     reduce using rule 79 (Reverse)
+    $default  reduce using rule 77 (SignOpt)
+
+    Expr      go to state 133
+    AndExpr   go to state 23
+    CmprExpr  go to state 24
+    AddExpr   go to state 25
+    MulExpr   go to state 26
+    UnaExpr   go to state 27
+    SignOpt   go to state 28
+    Reverse   go to state 29
+
+
+State 118
+
+   49 Assign: REM_ASSIGN ErrLHS . Expr LeaveExpr
+
+    '+'  shift, and go to state 13
+    '-'  shift, and go to state 14
+    '!'  shift, and go to state 15
+
+    TRUE      reduce using rule 79 (Reverse)
+    FALSE     reduce using rule 79 (Reverse)
+    $default  reduce using rule 77 (SignOpt)
+
+    Expr      go to state 134
+    AndExpr   go to state 23
+    CmprExpr  go to state 24
+    AddExpr   go to state 25
+    MulExpr   go to state 26
+    UnaExpr   go to state 27
+    SignOpt   go to state 28
+    Reverse   go to state 29
+
+
+State 119
+
+   44 Assign: Eq ErrLHS . Expr LeaveExpr
+
+    '+'  shift, and go to state 13
+    '-'  shift, and go to state 14
+    '!'  shift, and go to state 15
+
+    TRUE      reduce using rule 79 (Reverse)
+    FALSE     reduce using rule 79 (Reverse)
+    $default  reduce using rule 77 (SignOpt)
+
+    Expr      go to state 135
+    AndExpr   go to state 23
+    CmprExpr  go to state 24
+    AddExpr   go to state 25
+    MulExpr   go to state 26
+    UnaExpr   go to state 27
+    SignOpt   go to state 28
+    Reverse   go to state 29
+
+
+State 120
+
+   38 Literal: '"' str '"' .
+
+    $default  reduce using rule 38 (Literal)
+
+
+State 121
+
+   87 Atom: Ident IndHead Expr . IndEnd
+
+    ']'  shift, and go to state 128
+
+    IndEnd  go to state 136
+
+
+State 122
+
+   88 Atom: EnterCast TypeName ')' . Ident
+   89     | EnterCast TypeName ')' . Literal
+   90     | EnterCast TypeName ')' . Ident '[' Literal ']'
+
+    INT_LIT    shift, and go to state 63
+    FLOAT_LIT  shift, and go to state 64
+    IDENT      shift, and go to state 40
+    '"'        shift, and go to state 66
+
+    Ident    go to state 137
+    Literal  go to state 138
+
+
+State 123
+
+  100 BracEnd: ')' .
+
+    $default  reduce using rule 100 (BracEnd)
+
+
+State 124
+
+   86 Atom: BracHead Expr BracEnd .
+
+    $default  reduce using rule 86 (Atom)
+
+
+State 125
+
+   13 IfStmt: IF '(' Expr Cond LeaveExpr . ')' NewScope StatementList EndScope ElseStmt StatementList
+   14       | IF '(' Expr Cond LeaveExpr . ')' NewScope StatementList EndScope ElseStmt
+
+    ')'  shift, and go to state 139
+
+
+State 126
+
+    5 StatementList: WHILE '(' InterWhileCond Expr Cond . WhileLeaveExpr ')' NewScope StatementList while_end StatementList
+    6              | WHILE '(' InterWhileCond Expr Cond . WhileLeaveExpr ')' NewScope StatementList while_end
+
+    $default  reduce using rule 42 (LeaveExpr)
+
+    WhileLeaveExpr  go to state 140
+    LeaveExpr       go to state 141
+
+
+State 127
+
+    7 StatementList: FOR '(' Expr LeaveExpr Assign . ';' Expr Cond LeaveExpr ';' Expr LeaveExpr Assign ')' NewScope StatementList EndScope StatementList
+    8              | FOR '(' Expr LeaveExpr Assign . ';' Expr Cond LeaveExpr ';' Expr LeaveExpr Assign ')' NewScope StatementList EndScope
+
+    ';'  shift, and go to state 142
+
+
+State 128
+
+   98 IndEnd: ']' .
+
+    $default  reduce using rule 98 (IndEnd)
+
+
+State 129
+
+   26 DeclarationStmt: Type Ident IndHead Expr IndEnd .
+
+    $default  reduce using rule 26 (DeclarationStmt)
+
+
+State 130
+
+   45 Assign: ADD_ASSIGN ErrLHS Expr . LeaveExpr
+
+    $default  reduce using rule 42 (LeaveExpr)
+
+    LeaveExpr  go to state 143
+
+
+State 131
+
+   46 Assign: SUB_ASSIGN ErrLHS Expr . LeaveExpr
+
+    $default  reduce using rule 42 (LeaveExpr)
+
+    LeaveExpr  go to state 144
+
+
+State 132
+
+   47 Assign: MUL_ASSIGN ErrLHS Expr . LeaveExpr
+
+    $default  reduce using rule 42 (LeaveExpr)
+
+    LeaveExpr  go to state 145
+
+
+State 133
+
+   48 Assign: QUO_ASSIGN ErrLHS Expr . LeaveExpr
+
+    $default  reduce using rule 42 (LeaveExpr)
+
+    LeaveExpr  go to state 146
+
+
+State 134
+
+   49 Assign: REM_ASSIGN ErrLHS Expr . LeaveExpr
+
+    $default  reduce using rule 42 (LeaveExpr)
+
+    LeaveExpr  go to state 147
+
+
+State 135
+
+   44 Assign: Eq ErrLHS Expr . LeaveExpr
+
+    $default  reduce using rule 42 (LeaveExpr)
+
+    LeaveExpr  go to state 148
+
+
+State 136
+
+   87 Atom: Ident IndHead Expr IndEnd .
+
+    $default  reduce using rule 87 (Atom)
+
+
+State 137
+
+   88 Atom: EnterCast TypeName ')' Ident .
+   90     | EnterCast TypeName ')' Ident . '[' Literal ']'
+
+    '['  shift, and go to state 149
+
+    $default  reduce using rule 88 (Atom)
+
+
+State 138
+
+   89 Atom: EnterCast TypeName ')' Literal .
+
+    $default  reduce using rule 89 (Atom)
+
+
+State 139
+
+   13 IfStmt: IF '(' Expr Cond LeaveExpr ')' . NewScope StatementList EndScope ElseStmt StatementList
+   14       | IF '(' Expr Cond LeaveExpr ')' . NewScope StatementList EndScope ElseStmt
+
+    '{'  shift, and go to state 150
+
+    NewScope  go to state 151
+
+
+State 140
+
+    5 StatementList: WHILE '(' InterWhileCond Expr Cond WhileLeaveExpr . ')' NewScope StatementList while_end StatementList
+    6              | WHILE '(' InterWhileCond Expr Cond WhileLeaveExpr . ')' NewScope StatementList while_end
+
+    ')'  shift, and go to state 152
+
+
+State 141
+
+   11 WhileLeaveExpr: LeaveExpr .
+
+    $default  reduce using rule 11 (WhileLeaveExpr)
+
+
+State 142
+
+    7 StatementList: FOR '(' Expr LeaveExpr Assign ';' . Expr Cond LeaveExpr ';' Expr LeaveExpr Assign ')' NewScope StatementList EndScope StatementList
+    8              | FOR '(' Expr LeaveExpr Assign ';' . Expr Cond LeaveExpr ';' Expr LeaveExpr Assign ')' NewScope StatementList EndScope
+
+    '+'  shift, and go to state 13
+    '-'  shift, and go to state 14
+    '!'  shift, and go to state 15
+
+    TRUE      reduce using rule 79 (Reverse)
+    FALSE     reduce using rule 79 (Reverse)
+    $default  reduce using rule 77 (SignOpt)
+
+    Expr      go to state 153
+    AndExpr   go to state 23
+    CmprExpr  go to state 24
+    AddExpr   go to state 25
+    MulExpr   go to state 26
+    UnaExpr   go to state 27
+    SignOpt   go to state 28
+    Reverse   go to state 29
+
+
+State 143
+
+   45 Assign: ADD_ASSIGN ErrLHS Expr LeaveExpr .
+
+    $default  reduce using rule 45 (Assign)
+
+
+State 144
+
+   46 Assign: SUB_ASSIGN ErrLHS Expr LeaveExpr .
+
+    $default  reduce using rule 46 (Assign)
+
+
+State 145
+
+   47 Assign: MUL_ASSIGN ErrLHS Expr LeaveExpr .
+
+    $default  reduce using rule 47 (Assign)
+
+
+State 146
+
+   48 Assign: QUO_ASSIGN ErrLHS Expr LeaveExpr .
+
+    $default  reduce using rule 48 (Assign)
+
+
+State 147
+
+   49 Assign: REM_ASSIGN ErrLHS Expr LeaveExpr .
+
+    $default  reduce using rule 49 (Assign)
+
+
+State 148
+
+   44 Assign: Eq ErrLHS Expr LeaveExpr .
+
+    $default  reduce using rule 44 (Assign)
+
+
+State 149
+
+   90 Atom: EnterCast TypeName ')' Ident '[' . Literal ']'
+
+    INT_LIT    shift, and go to state 63
+    FLOAT_LIT  shift, and go to state 64
+    '"'        shift, and go to state 66
+
+    Literal  go to state 154
+
+
+State 150
+
+   19 NewScope: '{' .
+
+    $default  reduce using rule 19 (NewScope)
+
+
+State 151
+
+   13 IfStmt: IF '(' Expr Cond LeaveExpr ')' NewScope . StatementList EndScope ElseStmt StatementList
+   14       | IF '(' Expr Cond LeaveExpr ')' NewScope . StatementList EndScope ElseStmt
+
+    INT       shift, and go to state 4
+    FLOAT     shift, and go to state 5
+    BOOL      shift, and go to state 6
+    STRING    shift, and go to state 7
+    LoopStmt  shift, and go to state 8
+    PRINT     shift, and go to state 9
+    IF        shift, and go to state 10
+    WHILE     shift, and go to state 11
+    FOR       shift, and go to state 12
+    '+'       shift, and go to state 13
+    '-'       shift, and go to state 14
+    '!'       shift, and go to state 15
+
+    TRUE      reduce using rule 79 (Reverse)
+    FALSE     reduce using rule 79 (Reverse)
+    $default  reduce using rule 77 (SignOpt)
+
+    StatementList    go to state 155
+    IfStmt           go to state 17
+    Statement        go to state 18
+    DeclarationStmt  go to state 19
+    Type             go to state 20
+    TypeName         go to state 21
+    Expr             go to state 22
+    AndExpr          go to state 23
+    CmprExpr         go to state 24
+    AddExpr          go to state 25
+    MulExpr          go to state 26
+    UnaExpr          go to state 27
+    SignOpt          go to state 28
+    Reverse          go to state 29
+    PrintStmt        go to state 30
+
+
+State 152
+
+    5 StatementList: WHILE '(' InterWhileCond Expr Cond WhileLeaveExpr ')' . NewScope StatementList while_end StatementList
+    6              | WHILE '(' InterWhileCond Expr Cond WhileLeaveExpr ')' . NewScope StatementList while_end
+
+    '{'  shift, and go to state 150
+
+    NewScope  go to state 156
+
+
+State 153
+
+    7 StatementList: FOR '(' Expr LeaveExpr Assign ';' Expr . Cond LeaveExpr ';' Expr LeaveExpr Assign ')' NewScope StatementList EndScope StatementList
+    8              | FOR '(' Expr LeaveExpr Assign ';' Expr . Cond LeaveExpr ';' Expr LeaveExpr Assign ')' NewScope StatementList EndScope
+
+    $default  reduce using rule 18 (Cond)
+
+    Cond  go to state 157
+
+
+State 154
+
+   90 Atom: EnterCast TypeName ')' Ident '[' Literal . ']'
+
+    ']'  shift, and go to state 158
+
+
+State 155
+
+   13 IfStmt: IF '(' Expr Cond LeaveExpr ')' NewScope StatementList . EndScope ElseStmt StatementList
+   14       | IF '(' Expr Cond LeaveExpr ')' NewScope StatementList . EndScope ElseStmt
+
+    '}'  shift, and go to state 159
+
+    EndScope  go to state 160
+
+
+State 156
+
+    5 StatementList: WHILE '(' InterWhileCond Expr Cond WhileLeaveExpr ')' NewScope . StatementList while_end StatementList
+    6              | WHILE '(' InterWhileCond Expr Cond WhileLeaveExpr ')' NewScope . StatementList while_end
+
+    INT       shift, and go to state 4
+    FLOAT     shift, and go to state 5
+    BOOL      shift, and go to state 6
+    STRING    shift, and go to state 7
+    LoopStmt  shift, and go to state 8
+    PRINT     shift, and go to state 9
+    IF        shift, and go to state 10
+    WHILE     shift, and go to state 11
+    FOR       shift, and go to state 12
+    '+'       shift, and go to state 13
+    '-'       shift, and go to state 14
+    '!'       shift, and go to state 15
+
+    TRUE      reduce using rule 79 (Reverse)
+    FALSE     reduce using rule 79 (Reverse)
+    $default  reduce using rule 77 (SignOpt)
+
+    StatementList    go to state 161
+    IfStmt           go to state 17
+    Statement        go to state 18
+    DeclarationStmt  go to state 19
+    Type             go to state 20
+    TypeName         go to state 21
+    Expr             go to state 22
+    AndExpr          go to state 23
+    CmprExpr         go to state 24
+    AddExpr          go to state 25
+    MulExpr          go to state 26
+    UnaExpr          go to state 27
+    SignOpt          go to state 28
+    Reverse          go to state 29
+    PrintStmt        go to state 30
+
+
+State 157
+
+    7 StatementList: FOR '(' Expr LeaveExpr Assign ';' Expr Cond . LeaveExpr ';' Expr LeaveExpr Assign ')' NewScope StatementList EndScope StatementList
+    8              | FOR '(' Expr LeaveExpr Assign ';' Expr Cond . LeaveExpr ';' Expr LeaveExpr Assign ')' NewScope StatementList EndScope
+
+    $default  reduce using rule 42 (LeaveExpr)
+
+    LeaveExpr  go to state 162
+
+
+State 158
+
+   90 Atom: EnterCast TypeName ')' Ident '[' Literal ']' .
+
+    $default  reduce using rule 90 (Atom)
+
+
+State 159
+
+   20 EndScope: '}' .
+
+    $default  reduce using rule 20 (EndScope)
+
+
+State 160
+
+   13 IfStmt: IF '(' Expr Cond LeaveExpr ')' NewScope StatementList EndScope . ElseStmt StatementList
+   14       | IF '(' Expr Cond LeaveExpr ')' NewScope StatementList EndScope . ElseStmt
+
+    ELSE  shift, and go to state 163
+
+    $default  reduce using rule 17 (ElseStmt)
+
+    ElseStmt  go to state 164
+
+
+State 161
+
+    5 StatementList: WHILE '(' InterWhileCond Expr Cond WhileLeaveExpr ')' NewScope StatementList . while_end StatementList
+    6              | WHILE '(' InterWhileCond Expr Cond WhileLeaveExpr ')' NewScope StatementList . while_end
+
+    '}'  shift, and go to state 159
+
+    while_end  go to state 165
+    EndScope   go to state 166
+
+
+State 162
+
+    7 StatementList: FOR '(' Expr LeaveExpr Assign ';' Expr Cond LeaveExpr . ';' Expr LeaveExpr Assign ')' NewScope StatementList EndScope StatementList
+    8              | FOR '(' Expr LeaveExpr Assign ';' Expr Cond LeaveExpr . ';' Expr LeaveExpr Assign ')' NewScope StatementList EndScope
+
+    ';'  shift, and go to state 167
+
+
+State 163
+
+   15 ElseStmt: ELSE . IF '(' Expr LeaveExpr ')' NewScope StatementList EndScope ElseStmt
+   16         | ELSE . NewScope StatementList EndScope
+
+    IF   shift, and go to state 168
+    '{'  shift, and go to state 150
+
+    NewScope  go to state 169
+
+
+State 164
+
+   13 IfStmt: IF '(' Expr Cond LeaveExpr ')' NewScope StatementList EndScope ElseStmt . StatementList
+   14       | IF '(' Expr Cond LeaveExpr ')' NewScope StatementList EndScope ElseStmt .
+
+    INT       shift, and go to state 4
+    FLOAT     shift, and go to state 5
+    BOOL      shift, and go to state 6
+    STRING    shift, and go to state 7
+    LoopStmt  shift, and go to state 8
+    PRINT     shift, and go to state 9
+    IF        shift, and go to state 10
+    WHILE     shift, and go to state 11
+    FOR       shift, and go to state 12
+    '+'       shift, and go to state 13
+    '-'       shift, and go to state 14
+    '!'       shift, and go to state 15
+
+    $end      reduce using rule 14 (IfStmt)
+    TRUE      reduce using rule 79 (Reverse)
+    FALSE     reduce using rule 79 (Reverse)
+    '}'       reduce using rule 14 (IfStmt)
+    $default  reduce using rule 77 (SignOpt)
+
+    StatementList    go to state 170
+    IfStmt           go to state 17
+    Statement        go to state 18
+    DeclarationStmt  go to state 19
+    Type             go to state 20
+    TypeName         go to state 21
+    Expr             go to state 22
+    AndExpr          go to state 23
+    CmprExpr         go to state 24
+    AddExpr          go to state 25
+    MulExpr          go to state 26
+    UnaExpr          go to state 27
+    SignOpt          go to state 28
+    Reverse          go to state 29
+    PrintStmt        go to state 30
+
+
+State 165
+
+    5 StatementList: WHILE '(' InterWhileCond Expr Cond WhileLeaveExpr ')' NewScope StatementList while_end . StatementList
+    6              | WHILE '(' InterWhileCond Expr Cond WhileLeaveExpr ')' NewScope StatementList while_end .
+
+    INT       shift, and go to state 4
+    FLOAT     shift, and go to state 5
+    BOOL      shift, and go to state 6
+    STRING    shift, and go to state 7
+    LoopStmt  shift, and go to state 8
+    PRINT     shift, and go to state 9
+    IF        shift, and go to state 10
+    WHILE     shift, and go to state 11
+    FOR       shift, and go to state 12
+    '+'       shift, and go to state 13
+    '-'       shift, and go to state 14
+    '!'       shift, and go to state 15
+
+    $end      reduce using rule 6 (StatementList)
+    TRUE      reduce using rule 79 (Reverse)
+    FALSE     reduce using rule 79 (Reverse)
+    '}'       reduce using rule 6 (StatementList)
+    $default  reduce using rule 77 (SignOpt)
+
+    StatementList    go to state 171
+    IfStmt           go to state 17
+    Statement        go to state 18
+    DeclarationStmt  go to state 19
+    Type             go to state 20
+    TypeName         go to state 21
+    Expr             go to state 22
+    AndExpr          go to state 23
+    CmprExpr         go to state 24
+    AddExpr          go to state 25
+    MulExpr          go to state 26
+    UnaExpr          go to state 27
+    SignOpt          go to state 28
+    Reverse          go to state 29
+    PrintStmt        go to state 30
+
+
+State 166
+
+   12 while_end: EndScope .
+
+    $default  reduce using rule 12 (while_end)
+
+
+State 167
+
+    7 StatementList: FOR '(' Expr LeaveExpr Assign ';' Expr Cond LeaveExpr ';' . Expr LeaveExpr Assign ')' NewScope StatementList EndScope StatementList
+    8              | FOR '(' Expr LeaveExpr Assign ';' Expr Cond LeaveExpr ';' . Expr LeaveExpr Assign ')' NewScope StatementList EndScope
+
+    '+'  shift, and go to state 13
+    '-'  shift, and go to state 14
+    '!'  shift, and go to state 15
+
+    TRUE      reduce using rule 79 (Reverse)
+    FALSE     reduce using rule 79 (Reverse)
+    $default  reduce using rule 77 (SignOpt)
+
+    Expr      go to state 172
+    AndExpr   go to state 23
+    CmprExpr  go to state 24
+    AddExpr   go to state 25
+    MulExpr   go to state 26
+    UnaExpr   go to state 27
+    SignOpt   go to state 28
+    Reverse   go to state 29
+
+
+State 168
+
+   15 ElseStmt: ELSE IF . '(' Expr LeaveExpr ')' NewScope StatementList EndScope ElseStmt
+
+    '('  shift, and go to state 173
+
+
+State 169
+
+   16 ElseStmt: ELSE NewScope . StatementList EndScope
+
+    INT       shift, and go to state 4
+    FLOAT     shift, and go to state 5
+    BOOL      shift, and go to state 6
+    STRING    shift, and go to state 7
+    LoopStmt  shift, and go to state 8
+    PRINT     shift, and go to state 9
+    IF        shift, and go to state 10
+    WHILE     shift, and go to state 11
+    FOR       shift, and go to state 12
+    '+'       shift, and go to state 13
+    '-'       shift, and go to state 14
+    '!'       shift, and go to state 15
+
+    TRUE      reduce using rule 79 (Reverse)
+    FALSE     reduce using rule 79 (Reverse)
+    $default  reduce using rule 77 (SignOpt)
+
+    StatementList    go to state 174
+    IfStmt           go to state 17
+    Statement        go to state 18
+    DeclarationStmt  go to state 19
+    Type             go to state 20
+    TypeName         go to state 21
+    Expr             go to state 22
+    AndExpr          go to state 23
+    CmprExpr         go to state 24
+    AddExpr          go to state 25
+    MulExpr          go to state 26
+    UnaExpr          go to state 27
+    SignOpt          go to state 28
+    Reverse          go to state 29
+    PrintStmt        go to state 30
+
+
+State 170
+
+   13 IfStmt: IF '(' Expr Cond LeaveExpr ')' NewScope StatementList EndScope ElseStmt StatementList .
+
+    $default  reduce using rule 13 (IfStmt)
+
+
+State 171
+
+    5 StatementList: WHILE '(' InterWhileCond Expr Cond WhileLeaveExpr ')' NewScope StatementList while_end StatementList .
+
+    $default  reduce using rule 5 (StatementList)
+
+
+State 172
+
+    7 StatementList: FOR '(' Expr LeaveExpr Assign ';' Expr Cond LeaveExpr ';' Expr . LeaveExpr Assign ')' NewScope StatementList EndScope StatementList
+    8              | FOR '(' Expr LeaveExpr Assign ';' Expr Cond LeaveExpr ';' Expr . LeaveExpr Assign ')' NewScope StatementList EndScope
+
+    $default  reduce using rule 42 (LeaveExpr)
+
+    LeaveExpr  go to state 175
+
+
+State 173
+
+   15 ElseStmt: ELSE IF '(' . Expr LeaveExpr ')' NewScope StatementList EndScope ElseStmt
+
+    '+'  shift, and go to state 13
+    '-'  shift, and go to state 14
+    '!'  shift, and go to state 15
+
+    TRUE      reduce using rule 79 (Reverse)
+    FALSE     reduce using rule 79 (Reverse)
+    $default  reduce using rule 77 (SignOpt)
+
+    Expr      go to state 176
+    AndExpr   go to state 23
+    CmprExpr  go to state 24
+    AddExpr   go to state 25
+    MulExpr   go to state 26
+    UnaExpr   go to state 27
+    SignOpt   go to state 28
+    Reverse   go to state 29
+
+
+State 174
+
+   16 ElseStmt: ELSE NewScope StatementList . EndScope
+
+    '}'  shift, and go to state 159
+
+    EndScope  go to state 177
+
+
+State 175
+
+    7 StatementList: FOR '(' Expr LeaveExpr Assign ';' Expr Cond LeaveExpr ';' Expr LeaveExpr . Assign ')' NewScope StatementList EndScope StatementList
+    8              | FOR '(' Expr LeaveExpr Assign ';' Expr Cond LeaveExpr ';' Expr LeaveExpr . Assign ')' NewScope StatementList EndScope
+
+    ADD_ASSIGN  shift, and go to state 84
+    SUB_ASSIGN  shift, and go to state 85
+    MUL_ASSIGN  shift, and go to state 86
+    QUO_ASSIGN  shift, and go to state 87
+    REM_ASSIGN  shift, and go to state 88
+    '='         shift, and go to state 89
+
+    $default  reduce using rule 50 (Assign)
+
+    Assign  go to state 178
+    Eq      go to state 91
+
+
+State 176
+
+   15 ElseStmt: ELSE IF '(' Expr . LeaveExpr ')' NewScope StatementList EndScope ElseStmt
+
+    $default  reduce using rule 42 (LeaveExpr)
+
+    LeaveExpr  go to state 179
+
+
+State 177
+
+   16 ElseStmt: ELSE NewScope StatementList EndScope .
+
+    $default  reduce using rule 16 (ElseStmt)
+
+
+State 178
+
+    7 StatementList: FOR '(' Expr LeaveExpr Assign ';' Expr Cond LeaveExpr ';' Expr LeaveExpr Assign . ')' NewScope StatementList EndScope StatementList
+    8              | FOR '(' Expr LeaveExpr Assign ';' Expr Cond LeaveExpr ';' Expr LeaveExpr Assign . ')' NewScope StatementList EndScope
+
+    ')'  shift, and go to state 180
+
+
+State 179
+
+   15 ElseStmt: ELSE IF '(' Expr LeaveExpr . ')' NewScope StatementList EndScope ElseStmt
+
+    ')'  shift, and go to state 181
+
+
+State 180
+
+    7 StatementList: FOR '(' Expr LeaveExpr Assign ';' Expr Cond LeaveExpr ';' Expr LeaveExpr Assign ')' . NewScope StatementList EndScope StatementList
+    8              | FOR '(' Expr LeaveExpr Assign ';' Expr Cond LeaveExpr ';' Expr LeaveExpr Assign ')' . NewScope StatementList EndScope
+
+    '{'  shift, and go to state 150
+
+    NewScope  go to state 182
+
+
+State 181
+
+   15 ElseStmt: ELSE IF '(' Expr LeaveExpr ')' . NewScope StatementList EndScope ElseStmt
+
+    '{'  shift, and go to state 150
+
+    NewScope  go to state 183
+
+
+State 182
+
+    7 StatementList: FOR '(' Expr LeaveExpr Assign ';' Expr Cond LeaveExpr ';' Expr LeaveExpr Assign ')' NewScope . StatementList EndScope StatementList
+    8              | FOR '(' Expr LeaveExpr Assign ';' Expr Cond LeaveExpr ';' Expr LeaveExpr Assign ')' NewScope . StatementList EndScope
+
+    INT       shift, and go to state 4
+    FLOAT     shift, and go to state 5
+    BOOL      shift, and go to state 6
+    STRING    shift, and go to state 7
+    LoopStmt  shift, and go to state 8
+    PRINT     shift, and go to state 9
+    IF        shift, and go to state 10
+    WHILE     shift, and go to state 11
+    FOR       shift, and go to state 12
+    '+'       shift, and go to state 13
+    '-'       shift, and go to state 14
+    '!'       shift, and go to state 15
+
+    TRUE      reduce using rule 79 (Reverse)
+    FALSE     reduce using rule 79 (Reverse)
+    $default  reduce using rule 77 (SignOpt)
+
+    StatementList    go to state 184
+    IfStmt           go to state 17
+    Statement        go to state 18
+    DeclarationStmt  go to state 19
+    Type             go to state 20
+    TypeName         go to state 21
+    Expr             go to state 22
+    AndExpr          go to state 23
+    CmprExpr         go to state 24
+    AddExpr          go to state 25
+    MulExpr          go to state 26
+    UnaExpr          go to state 27
+    SignOpt          go to state 28
+    Reverse          go to state 29
+    PrintStmt        go to state 30
+
+
+State 183
+
+   15 ElseStmt: ELSE IF '(' Expr LeaveExpr ')' NewScope . StatementList EndScope ElseStmt
+
+    INT       shift, and go to state 4
+    FLOAT     shift, and go to state 5
+    BOOL      shift, and go to state 6
+    STRING    shift, and go to state 7
+    LoopStmt  shift, and go to state 8
+    PRINT     shift, and go to state 9
+    IF        shift, and go to state 10
+    WHILE     shift, and go to state 11
+    FOR       shift, and go to state 12
+    '+'       shift, and go to state 13
+    '-'       shift, and go to state 14
+    '!'       shift, and go to state 15
+
+    TRUE      reduce using rule 79 (Reverse)
+    FALSE     reduce using rule 79 (Reverse)
+    $default  reduce using rule 77 (SignOpt)
+
+    StatementList    go to state 185
+    IfStmt           go to state 17
+    Statement        go to state 18
+    DeclarationStmt  go to state 19
+    Type             go to state 20
+    TypeName         go to state 21
+    Expr             go to state 22
+    AndExpr          go to state 23
+    CmprExpr         go to state 24
+    AddExpr          go to state 25
+    MulExpr          go to state 26
+    UnaExpr          go to state 27
+    SignOpt          go to state 28
+    Reverse          go to state 29
+    PrintStmt        go to state 30
+
+
+State 184
+
+    7 StatementList: FOR '(' Expr LeaveExpr Assign ';' Expr Cond LeaveExpr ';' Expr LeaveExpr Assign ')' NewScope StatementList . EndScope StatementList
+    8              | FOR '(' Expr LeaveExpr Assign ';' Expr Cond LeaveExpr ';' Expr LeaveExpr Assign ')' NewScope StatementList . EndScope
+
+    '}'  shift, and go to state 159
+
+    EndScope  go to state 186
+
+
+State 185
+
+   15 ElseStmt: ELSE IF '(' Expr LeaveExpr ')' NewScope StatementList . EndScope ElseStmt
+
+    '}'  shift, and go to state 159
+
+    EndScope  go to state 187
+
+
+State 186
+
+    7 StatementList: FOR '(' Expr LeaveExpr Assign ';' Expr Cond LeaveExpr ';' Expr LeaveExpr Assign ')' NewScope StatementList EndScope . StatementList
+    8              | FOR '(' Expr LeaveExpr Assign ';' Expr Cond LeaveExpr ';' Expr LeaveExpr Assign ')' NewScope StatementList EndScope .
+
+    INT       shift, and go to state 4
+    FLOAT     shift, and go to state 5
+    BOOL      shift, and go to state 6
+    STRING    shift, and go to state 7
+    LoopStmt  shift, and go to state 8
+    PRINT     shift, and go to state 9
+    IF        shift, and go to state 10
+    WHILE     shift, and go to state 11
+    FOR       shift, and go to state 12
+    '+'       shift, and go to state 13
+    '-'       shift, and go to state 14
+    '!'       shift, and go to state 15
+
+    $end      reduce using rule 8 (StatementList)
+    TRUE      reduce using rule 79 (Reverse)
+    FALSE     reduce using rule 79 (Reverse)
+    '}'       reduce using rule 8 (StatementList)
+    $default  reduce using rule 77 (SignOpt)
+
+    StatementList    go to state 188
+    IfStmt           go to state 17
+    Statement        go to state 18
+    DeclarationStmt  go to state 19
+    Type             go to state 20
+    TypeName         go to state 21
+    Expr             go to state 22
+    AndExpr          go to state 23
+    CmprExpr         go to state 24
+    AddExpr          go to state 25
+    MulExpr          go to state 26
+    UnaExpr          go to state 27
+    SignOpt          go to state 28
+    Reverse          go to state 29
+    PrintStmt        go to state 30
+
+
+State 187
+
+   15 ElseStmt: ELSE IF '(' Expr LeaveExpr ')' NewScope StatementList EndScope . ElseStmt
+
+    ELSE  shift, and go to state 163
+
+    $default  reduce using rule 17 (ElseStmt)
+
+    ElseStmt  go to state 189
+
+
+State 188
+
+    7 StatementList: FOR '(' Expr LeaveExpr Assign ';' Expr Cond LeaveExpr ';' Expr LeaveExpr Assign ')' NewScope StatementList EndScope StatementList .
+
+    $default  reduce using rule 7 (StatementList)
+
+
+State 189
+
+   15 ElseStmt: ELSE IF '(' Expr LeaveExpr ')' NewScope StatementList EndScope ElseStmt .
+
+    $default  reduce using rule 15 (ElseStmt)
