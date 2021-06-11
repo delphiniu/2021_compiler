@@ -40,6 +40,7 @@
     static char *ftostr(float);
     static char *tostr(char *);
     static void incdec_codegen(int, int);
+    static void print_assign();
 
     // variables for print .j file
     char load_type = '\0';
@@ -55,6 +56,7 @@
     int isArray = 0;
     int rhs_ad = 0;
     int load_array = 0;
+    char *assign_optr;
 
     // variables for correct output message
     int declare = 0;
@@ -379,38 +381,27 @@ or
 ;
 
 Assign
-    : Eq ErrLHS Expr LeaveExpr { if(!isArray)
-                                 {
-                                     if(exprs -> nstk[0] != 's' && !deferr) 
-                                     type_validation('=', asgn, exprs -> nstk[0]);
-                                     if(asgn == 's')
-                                         fprintf(fout, "astore %d\n", assign_ad);
-                                     else if(asgn == 'b')
-                                         fprintf(fout, "istore %d\n", assign_ad);
-                                     else
-                                         fprintf(fout, "%cstore %d\n", asgn, assign_ad);
-                                 }
-                                 else
-                                     fprintf(fout, "%castore\n", asgn);
-                                     // fprintf(fout, "%castore %d\n", asgn, assign_ad);
-                                 asgn = '\0';
-                                 deferr = 0;
-                                 printf("ASSIGN\n"); 
-                                 strcpy(errlhs, "");
-                                 isArray = 0;
-                         }
-    | ADD_ASSIGN  ErrLHS Expr LeaveExpr { printf("ADD_ASSIGN\n"); strcpy(errlhs, "");
-                                        }
-    | SUB_ASSIGN ErrLHS Expr LeaveExpr { printf("SUB_ASSIGN\n"); strcpy(errlhs, ""); }
-    | MUL_ASSIGN ErrLHS Expr LeaveExpr { printf("MUL_ASSIGN\n"); strcpy(errlhs, ""); }
-    | QUO_ASSIGN ErrLHS Expr LeaveExpr { printf("QUO_ASSIGN\n"); strcpy(errlhs, ""); }
-    | REM_ASSIGN ErrLHS Expr LeaveExpr { printf("REM_ASSIGN\n"); strcpy(errlhs, ""); }
+    : AssignOptr ErrLHS Expr LeaveExpr { print_assign(); }
     | 
 ;
 
-Eq
-    : '=' { asgn = exprs -> nstk[0]; 
-            }
+AssignOptr
+    : '=' { asgn = exprs -> nstk[0]; assign_optr = "ASSIGN\n"; }
+    | ADD_ASSIGN { asgn = exprs -> nstk[0]; assign_optr = "ADD_ASSIGN\n"; 
+                   fprintf(fout, "%cload %d\n", asgn, assign_ad);
+                 }
+    | SUB_ASSIGN { asgn = exprs -> nstk[0]; assign_optr = "SUB_ASSIGN\n"; 
+                   fprintf(fout, "%cload %d\n", asgn, assign_ad);
+                 }
+    | MUL_ASSIGN { asgn = exprs -> nstk[0]; assign_optr = "MUL_ASSIGN\n"; 
+                   fprintf(fout, "%cload %d\n", asgn, assign_ad);
+                 }
+    | QUO_ASSIGN { asgn = exprs -> nstk[0]; assign_optr = "QUO_ASSIGN\n"; 
+                   fprintf(fout, "%cload %d\n", asgn, assign_ad);
+                 }
+    | REM_ASSIGN { asgn = exprs -> nstk[0]; assign_optr = "REM_ASSIGN\n"; 
+                   fprintf(fout, "%cload %d\n", asgn, assign_ad);
+                 }
 ;
 
 ErrLHS
@@ -879,11 +870,6 @@ void incdec_codegen(int inc, int pre)
     */
 }
 
-void empty_stack()
-{
-    
-}
-
 char *itostr(int num)
 {
     char *str = (char *)calloc(4, sizeof(char));
@@ -899,6 +885,50 @@ char *itostr(int num)
         div /= 10;
     }
     return str;
+}
+
+void print_assign()
+{ 
+    if(!isArray)
+    {
+        if(exprs -> nstk[0] != 's' && !deferr) 
+            type_validation('=', asgn, exprs -> nstk[0]);
+        if(asgn == 's')
+            fprintf(fout, "astore %d\n", assign_ad);
+        else if(asgn == 'b')
+            fprintf(fout, "istore %d\n", assign_ad);
+        else
+        {
+            switch(assign_optr[0])
+            {
+                case 'A':
+                    if(strcmp(assign_optr, "ADD_ASSIGN\n") == 0)
+                        fprintf(fout, "%cadd\n", asgn);
+                    break;
+                case 'S':
+                    fprintf(fout, "%csub\n", asgn);
+                    break;
+                case 'M':
+                    fprintf(fout, "%cmul\n", asgn);
+                    break;
+                case 'Q':
+                    fprintf(fout, "%cdiv\n", asgn);
+                    break;
+                case 'R':
+                    fprintf(fout, "%crem\n", asgn);
+                    break;
+            }
+            fprintf(fout, "%cstore %d\n", asgn, assign_ad);
+        }
+    }
+    else
+        fprintf(fout, "%castore\n", asgn);
+     // fprintf(fout, "%castore %d\n", asgn, assign_ad);
+    asgn = '\0';
+    deferr = 0;
+    printf("%s\n", assign_optr); 
+    strcpy(errlhs, "");
+    isArray = 0;
 }
 
 char *tostr(char *s)
