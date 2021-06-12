@@ -44,14 +44,28 @@
 
     // variables for print .j file
     char load_type = '\0';
+    char index_cast = '\0';
     int onearith_addr = 0;
     int printbool_num = 0;
     int gtr_num = 0;
+    int leq_num = 0;
+    int eql_num = 0;
+    int neq_num = 0;
+    int lss_num = 0;
     int sign_num = 0;
     int reverse_num = 0;
     int while_num = 0;
     int while_top = -1;
     int while_stack[100];
+    int for_num = 0;
+    int for_top = -1;
+    int for_stack[100];
+    int if_num = 0;
+    int if_top = -1;
+    int if_stack[100];
+    int end_top = -1;
+    int end_stack[100];
+    int end_num = 0;
     int assign_ad = 0;
     int isArray = 0;
     int rhs_ad = 0;
@@ -130,9 +144,10 @@ StatementList
     | Statement ';'
     | WHILE '(' InterWhileCond Expr Cond WhileLeaveExpr ')' NewScope StatementList while_end StatementList
     | WHILE '(' InterWhileCond Expr Cond WhileLeaveExpr ')' NewScope StatementList while_end 
-    | FOR '(' Expr LeaveExpr Assign ';' Expr Cond LeaveExpr ';' Expr LeaveExpr Assign ')' NewScope StatementList EndScope StatementList
-    | FOR '(' Expr LeaveExpr Assign ';' Expr Cond LeaveExpr ';' Expr LeaveExpr Assign ')' NewScope StatementList EndScope 
+    | FOR '(' Expr LeaveExpr Assign ';' PrintForLabel Expr Cond ForLeaveExpr ';' Expr LeaveExpr ForAssign ')' NewScope StatementList for_end StatementList
+    | FOR '(' Expr LeaveExpr Assign ';' PrintForLabel Expr Cond ForLeaveExpr ';' Expr LeaveExpr ForAssign ')' NewScope StatementList for_end 
     | IfStmt
+    | IfStmt StatementList
 ;
 
 InterWhileCond
@@ -153,15 +168,67 @@ while_end
                }
 ;
 
+PrintForLabel
+    : { fprintf(fout, "for_loop%d:\n", for_num); }
+;
+
+ForLeaveExpr
+    : LeaveExpr { fprintf(fout, "ifeq exit_for%d\n", for_num);
+                  fprintf(fout, "goto for_statement%d\n", for_num);
+                  fprintf(fout, "for_index_update%d:\n", for_num); }
+;
+
+ForAssign
+    : Assign { fprintf(fout, "goto for_loop%d\n", for_num);
+               fprintf(fout, "for_statement%d:\n", for_num); 
+               for_stack[++for_top] = for_num++;
+             }
+;
+
+for_end
+    : EndScope { fprintf(fout, "goto for_index_update%d\n", for_stack[for_top]);
+                 fprintf(fout, "exit_for%d:\n", for_stack[for_top--]); }
+;
+
 IfStmt
-    : IF '(' Expr Cond LeaveExpr ')' NewScope StatementList EndScope ElseStmt StatementList
-    | IF '(' Expr Cond LeaveExpr ')' NewScope StatementList EndScope ElseStmt
+    : IF '(' Expr Cond IfLeaveExpr ')' NewScope StatementList IfEndScope ElseStmt
+//    | IF '(' Expr Cond IfLeaveExpr ')' NewScope StatementList IfEndScope
 ;
 
 ElseStmt
-    : ELSE IF '(' Expr LeaveExpr ')' NewScope StatementList EndScope ElseStmt
-    | ELSE NewScope StatementList EndScope
-    |
+    : ELSE IF '(' Expr ElseLeaveExpr ')' NewScope StatementList ElseEndScope ElseStmt
+    | ELSE NewScope StatementList EndScope { //fprintf(fout, "else%d:\n", if_stack[if_top--]);
+                                             fprintf(fout, "if_end%d:\n", end_stack[end_top--]); }
+    | { //fprintf(fout, "else%d:\n", if_stack[if_top--]);
+        fprintf(fout, "if_end%d:\n", end_stack[end_top--]); }
+;
+/*
+IfLeaveExpr
+    : LeaveExpr { fprintf(fout, "ifeq if_end%d\n", end_num); }
+;
+*/
+IfLeaveExpr
+    : LeaveExpr { fprintf(fout, "ifeq else%d\n", if_num); 
+                  if_stack[++if_top] = if_num++;
+                  end_stack[++end_top] = end_num++;
+                }
+;
+
+ElseLeaveExpr
+    : LeaveExpr { fprintf(fout, "ifeq else%d\n", if_num); 
+                  if_stack[++if_top] = if_num++;
+                }
+;
+
+IfEndScope
+    : EndScope { fprintf(fout, "goto if_end%d\n", end_stack[end_top]); 
+                 fprintf(fout, "else%d:\n", if_stack[if_top--]);
+               }
+;
+
+ElseEndScope
+    : EndScope { fprintf(fout, "goto if_end%d\n", end_stack[end_top]);
+                 fprintf(fout, "else%d:\n", if_stack[if_top--]); }
 ;
 
 Cond
@@ -264,11 +331,14 @@ Ident
                           strcpy(printype, t -> stack[i] -> type);
                           if(ctype)
                           {
+                              if(!isArray)
+                                  fprintf(fout, "%c2%c\n", t -> stack[i] -> type[0], ctype);
                               printf("%c to %c\n", t -> stack[i] -> type[0] - 32, ctype - 32);
                               exprs -> nstk[exprs -> top + 1] = ctype;
                           }
                           else
                               exprs -> nstk[exprs -> top + 1] = t -> stack[i] -> type[0];
+                          index_cast = ctype;
                           ctype = '\0';
                           break;
                       }
@@ -313,6 +383,7 @@ Literal
             strcpy(printype, "int");
         if(ctype)
         {
+            fprintf(fout, "i2%c\n", ctype);
             printf("I to %c\n", ctype - 32);
             exprs -> nstk[exprs -> top + 1] = ctype;
         }
@@ -328,6 +399,7 @@ Literal
         strcpy(printype, "float");
         if(ctype)
         {
+            fprintf(fout, "f2%c\n", ctype);
             printf("F to %c\n", ctype - 32);
             exprs -> nstk[exprs -> top + 1] = ctype;
         }
@@ -510,7 +582,12 @@ Atom
                                 }
     | EnterCast TypeName ')' Ident
     | EnterCast TypeName ')' Literal
-    | EnterCast TypeName ')' Ident '[' Literal ']'
+    | EnterCast TypeName ')' Ident IndHead Expr IndEnd {
+                                                           if(load_array)
+                                                               fprintf(fout, "%caload\n", load_type);
+                                                           fprintf(fout, "%c2%c\n", load_type, index_cast);
+                                                           index_cast = '\0';
+                                                       }
 ;
 
 EnterCast
@@ -788,6 +865,14 @@ void print_optr(char optr_type, char optr)
             printf("AND\n");
             break;
         case '<':
+            fprintf(fout, "iflt L_lss%d_1\n", lss_num);
+            fprintf(fout, "L_lss%d_0:\n", lss_num);
+            fprintf(fout, "iconst_0\n");
+            fprintf(fout, "goto exit_lss%d_cmp\n", lss_num);
+            fprintf(fout, "L_lss%d_1:\n", lss_num);
+            fprintf(fout, "iconst_1\n");
+            fprintf(fout, "exit_lss%d_cmp:\n", lss_num);
+            lss_num++;
             printf("LSS\n");
             break;
         case '>':
@@ -802,15 +887,39 @@ void print_optr(char optr_type, char optr)
             printf("GTR\n");
             break;
         case 'a':
+            fprintf(fout, "ifle L_leq%d_1\n", leq_num);
+            fprintf(fout, "L_leq%d_0:\n", leq_num);
+            fprintf(fout, "iconst_0\n");
+            fprintf(fout, "goto exit_leq%d_cmp\n", leq_num);
+            fprintf(fout, "L_leq%d_1:\n", leq_num);
+            fprintf(fout, "iconst_1\n");
+            fprintf(fout, "exit_leq%d_cmp:\n", leq_num);
+            leq_num++;
             printf("LEQ\n");
             break;
         case 'b':
             printf("GEQ\n");
             break;
         case 'c':
+            fprintf(fout, "ifeq L_eql%d_1\n", eql_num);
+            fprintf(fout, "L_eql%d_0:\n", eql_num);
+            fprintf(fout, "iconst_0\n");
+            fprintf(fout, "goto exit_eql%d_cmp\n", eql_num);
+            fprintf(fout, "L_eql%d_1:\n", eql_num);
+            fprintf(fout, "iconst_1\n");
+            fprintf(fout, "exit_eql%d_cmp:\n", eql_num);
+            eql_num++;
             printf("EQL\n");
             break;
         case 'd':
+            fprintf(fout, "ifne L_neq%d_1\n", neq_num);
+            fprintf(fout, "L_neq%d_0:\n", neq_num);
+            fprintf(fout, "iconst_0\n");
+            fprintf(fout, "goto exit_neq%d_cmp\n", neq_num);
+            fprintf(fout, "L_neq%d_1:\n", neq_num);
+            fprintf(fout, "iconst_1\n");
+            fprintf(fout, "exit_neq%d_cmp:\n", neq_num);
+            neq_num++;
             printf("NEQ\n");
             break;
         case '+':
